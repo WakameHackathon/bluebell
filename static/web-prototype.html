@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>售后助手 Agent</title>
+<style>
+  :root{color-scheme:light;--ink:#24354b;--muted:#65758a;--blue:#3578df;--pale:#edf5fc}
+  *{box-sizing:border-box}
+  body{margin:0;background:#f5f8fb;color:var(--ink);font-family:"Microsoft YaHei","Noto Sans CJK SC",sans-serif}
+  main{max-width:980px;margin:32px auto;padding:0 24px}
+  h1{font-size:24px;margin:0 0 8px}
+  .intro{margin:0;color:var(--muted);font-size:14px;line-height:1.7}
+  .stage{min-height:640px;margin:22px 0 18px;display:grid;place-items:center;background:#fff;border-radius:28px;overflow:hidden}
+  .assistant{position:relative;width:min(100%,560px);height:620px;--state:idle}
+  .voice{position:absolute;z-index:3;top:62px;left:50%;width:202px;height:48px;transform:translate(-50%,7px) scale(.96);border:1px solid rgba(87,157,199,.45);border-radius:999px;background:radial-gradient(ellipse at 32% 12%,#e5f5fc 0%,#d6edf9 45%,#c5e5f5 100%);box-shadow:inset 0 1px 2px rgba(255,255,255,.55),0 5px 12px rgba(66,117,190,.08);display:flex;align-items:center;justify-content:center;gap:7px;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .18s ease,transform .24s ease,visibility 0s linear .18s}
+  .voice i{display:block;width:5px;height:var(--h);max-height:28px;border-radius:8px;background:linear-gradient(180deg,#70c3eb,#4b9fcd);transform:scaleY(.35)}
+  .assistant[data-state="speaking"] .voice{opacity:1;visibility:visible;transform:translate(-50%,0) scale(1);transition-delay:0s}
+  .assistant[data-state="speaking"] .voice i{animation:wave .65s ease-in-out infinite alternate}
+  .assistant[data-state="speaking"] .voice i:nth-child(3n){animation-delay:-.42s}
+  .assistant[data-state="speaking"] .voice i:nth-child(2n){animation-delay:-.2s}
+  @keyframes wave{to{transform:scaleY(1)}}
+  .orb-shell{position:absolute;z-index:2;left:50%;top:45%;width:282px;height:282px;transform:translate(-50%,-50%);filter:drop-shadow(0 15px 12px rgba(66,117,190,.13))}
+  #orb{width:100%;height:100%}
+  .assistant:not([data-state="working"]) [data-work-effects]{visibility:hidden}
+  @media(prefers-reduced-motion:reduce){[data-work-effects]{visibility:hidden}}
+  #orb svg{overflow:visible!important}
+  .control{appearance:none;padding:0;position:absolute;z-index:4;width:60px;height:46px;border-radius:50%;border:1.5px solid #579dc7;background:radial-gradient(ellipse at 32% 23%,#a5dcf6 0%,#87cff0 29%,#65bce6 65%,#53a7d2 100%);box-shadow:inset 0 1px 2px rgba(232,249,255,.42),inset -2px -3px 5px rgba(49,126,176,.1),0 5px 9px rgba(66,117,190,.12);cursor:pointer;transition:box-shadow .18s ease,scale .18s ease;display:grid;place-items:center}
+  .control::after{content:"";position:absolute;top:5px;left:9px;width:30px;height:19px;border-radius:50%;background:radial-gradient(ellipse,rgba(223,246,255,.24),rgba(223,246,255,0) 72%);pointer-events:none}
+  .control:hover{box-shadow:inset 0 1px 3px rgba(232,249,255,.5),0 6px 12px rgba(66,117,190,.18)}
+  .control:focus-visible{outline:3px solid #328cc9;outline-offset:4px}
+  .control.permission{left:calc(50% - 175px);top:393px;--angle:-20deg;animation:handFloat 3.6s ease-in-out infinite}
+  .control.mode{width:64px;height:48px;left:calc(50% - 76px);top:446px;--angle:-8deg;animation:handFloat 4.2s ease-in-out -1.8s infinite}
+  .assistant[data-state="working"] .control{animation-name:handWork;animation-duration:2.4s}
+  .assistant[data-state="working"] .control.mode{animation-delay:-1.1s;animation-duration:2.7s}
+  @keyframes handFloat{
+    0%,100%{transform:translate(-3px,4px) rotate(calc(var(--angle) - 7deg)) scale(1,.97)}
+    35%{transform:translate(4px,-9px) rotate(calc(var(--angle) + 9deg)) scale(.97,1.04)}
+    65%{transform:translate(8px,-2px) rotate(calc(var(--angle) + 3deg)) scale(1.03,.98)}
+  }
+  @keyframes handWork{
+    0%,100%{transform:translate(-5px,5px) rotate(calc(var(--angle) - 8deg)) scale(1.025,.975)}
+    28%{transform:translate(7px,-13px) rotate(calc(var(--angle) + 10deg)) scale(.975,1.035)}
+    55%{transform:translate(10px,-5px) rotate(calc(var(--angle) + 4deg)) scale(1.02,.98)}
+    78%{transform:translate(-4px,8px) rotate(calc(var(--angle) - 8deg)) scale(1.035,.97)}
+  }
+  .control:hover,.control:focus-visible,.control[aria-expanded="true"]{animation-play-state:paused}
+  .control:active{scale:.92}
+  .control-label{position:absolute;top:52px;left:50%;padding:8px 14px;border:1px solid #bdeaf1;border-radius:999px;background:#fff;color:#24728a;font-size:13px;white-space:nowrap;opacity:0;transform:translate(-50%,-4px);pointer-events:none;transition:opacity .18s ease,transform .18s ease}
+  .control[aria-expanded="true"] .control-label{opacity:1;transform:translate(-50%,0)}
+  .preview-label{font-size:13px;color:var(--muted);margin:0 0 10px}
+  .states{display:flex;flex-wrap:wrap;gap:10px}
+  .states button{appearance:none;border:1px solid #d7e1eb;border-radius:999px;background:#fff;color:#33465c;font:inherit;font-weight:600;font-size:14px;padding:10px 17px;cursor:pointer;transition:background .16s,border-color .16s,transform .16s}
+  .states button:hover{transform:translateY(-1px);border-color:#86b6ec}
+  .states button[aria-pressed="true"]{background:#e7f2ff;border-color:#65a4e8;color:#1458a2}
+  .states button:focus-visible{outline:3px solid #92c4ff;outline-offset:2px}
+  .description{min-height:26px;margin:14px 0 28px;color:#566a7e;font-size:14px}
+  .credit{font-size:12px;color:#738397;line-height:1.7}
+  .credit a{color:#3578df}
+
+  .workspace{max-width:760px;margin:0 auto 40px;padding:20px;background:#fff;border:1px solid #e1eaf2;border-radius:18px}
+  .workspace h2{font-size:19px;margin:0 0 8px}.workspace p{color:var(--muted);font-size:13px}
+  .toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.toolbar select,.toolbar button,.composer button{font:inherit;border:1px solid #cbd9e6;border-radius:10px;background:#fff;padding:9px 12px;color:#28425a}
+  .status{font-size:12px!important;margin-left:auto}.thread{height:260px;overflow:auto;border:1px solid #e4ebf1;border-radius:12px;padding:12px;background:#f9fbfd}.bubble{max-width:85%;padding:10px 12px;margin:8px 0;border-radius:12px;background:#edf4fa;white-space:pre-wrap;line-height:1.55}.bubble.user{margin-left:auto;background:#e3f1ff}.composer{display:grid;grid-template-columns:1fr auto;gap:8px;margin-top:10px}.composer textarea{font:inherit;resize:vertical;min-height:62px;padding:10px;border:1px solid #cbd9e6;border-radius:10px}.composer button{background:#3678dc;color:#fff;border:0;padding:0 18px}.context{width:100%;font:inherit;padding:9px;border:1px solid #d5e0ea;border-radius:10px}.notice{padding:10px 12px;background:#fff8e9;border:1px solid #eedba9;border-radius:10px;color:#765c20;font-size:13px!important}
+  body.poster{background:#fff}body.poster main{max-width:none;margin:0;padding:0}body.poster h1,body.poster .intro,body.poster .preview-label,body.poster .states,body.poster .description,body.poster .credit{display:none}body.poster .stage{width:560px;height:620px;min-height:0;margin:0;border-radius:0}
+  @media(max-width:640px){main{margin:20px auto;padding:0 14px}.stage{min-height:550px;border-radius:20px}.assistant{height:540px}.orb-shell{width:240px;height:240px;top:43%}.control.permission{left:calc(50% - 130px);top:310px}.control.mode{left:calc(50% - 48px);top:370px}.voice{top:42px;width:184px;height:44px}}
+  @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<main>
+  <h1>售后助手 Agent</h1>
+  <p class="intro">球体保留 Grok Ball 的丰富表情，并调整眼睛比例、间距与颜色。移动鼠标到球体上，眼睛会跟随注视；下方按钮只用于切换预览状态，不属于助手界面。</p>
+  <div class="stage">
+    <div class="assistant" id="assistant" data-state="idle" aria-label="售后助手悬浮球">
+      <div class="voice" aria-hidden="true"><i style="--h:10px"></i><i style="--h:26px"></i><i style="--h:38px"></i><i style="--h:21px"></i><i style="--h:44px"></i><i style="--h:29px"></i><i style="--h:50px"></i><i style="--h:31px"></i><i style="--h:43px"></i><i style="--h:23px"></i><i style="--h:36px"></i><i style="--h:14px"></i></div>
+
+      <div class="orb-shell"><div id="orb"></div></div>
+      <button class="control permission" type="button" aria-label="切换权限" aria-expanded="false" onclick="toggleTag(this)"><span class="control-label">切换权限</span></button>
+      <button class="control mode" type="button" aria-label="切换模式" aria-expanded="false" onclick="toggleTag(this)"><span class="control-label">切换模式</span></button>
+    </div>
+  </div>
+  <p class="preview-label">预览状态</p>
+  <div class="states" role="group" aria-label="选择动画状态">
+    <button type="button" data-state="idle" data-emotion="02" aria-pressed="true">空闲</button>
+    <button type="button" data-state="listening" data-emotion="03" aria-pressed="false">倾听</button>
+    <button type="button" data-state="understanding" data-emotion="30" aria-pressed="false">思考</button>
+    <button type="button" data-state="working" data-emotion="32" aria-pressed="false">操作网页</button>
+    <button type="button" data-state="speaking" data-emotion="39" aria-pressed="false">Agent 说话</button>
+    <button type="button" data-state="clarify" data-emotion="11" aria-pressed="false">需要确认</button>
+    <button type="button" data-state="waiting" data-emotion="35" aria-pressed="false">等待用户</button>
+  </div>
+  <p class="description" id="description" aria-live="polite">空闲：Grok Ball 02 待机表情；球外无彩色环。</p>
+  <p class="credit">表情引擎：<a href="https://tycoding.github.io/grok-ball/" target="_blank" rel="noreferrer">TyCoding / Grok Ball</a>（MIT，保留原作者署名）。本项目调整眼睛比例、间距和配色；小手、语音条与工作双弧独立实现。源码与许可证保留在 grok-ball-runtime 文件夹。</p>
+</main>
+<section class="workspace" aria-label="售后助手对话">
+  <h2>和售后助手说说你卡在哪里</h2><p>可以用日常说法描述问题。助手会先问清楚商品、目标和证据，再帮助整理方案。</p>
+  <p class="notice">当前为本地集成原型：对话和任务可用，14 项 Skill 仍在补齐业务逻辑；尚未连接浏览器执行器。请用虚构资料试用，任务记录目前未加密。</p>
+  <div class="toolbar"><label>协助方式 <select id="mode"><option value="self">我自己操作</option><option value="guided">陪我一步步操作</option><option value="auto">帮我准备（关键步骤由我确认）</option></select></label><button id="new-task" type="button">新建任务</button><span class="status" id="connection">正在检查服务…</span></div>
+  <div class="thread" id="thread" aria-live="polite"></div>
+  <textarea class="context" id="page-evidence" placeholder="可选：粘贴当前售后页面文字（请勿粘贴密码、验证码或支付信息）"></textarea>
+  <label style="display:block;margin-top:10px;font-size:13px;color:#53677a"><input type="checkbox" id="remote-consent"> 我同意把本次描述及上方粘贴的页面文字发送到阶跃星辰模型（Stepfun）处理。留空则只使用本机的基础回复。</label>
+  <div class="composer"><textarea id="message" placeholder="例如：买的电饭锅坏了，我想退货，但不知道怎么选"></textarea><button id="send" type="button">发送</button></div>
+</section>
+
+<script src="/static/grok-ball.js"></script>
+<script src="/static/aftercare-orb.js"></script>
+<script src="/static/agent-ui.js"></script>
+<script>
+  const assistant=document.getElementById('assistant');
+  const mount=document.getElementById('orb');
+  const description=document.getElementById('description');
+  const ball=GrokBall.create(mount,{emotion:'02',color:'#51b4ef',eyeColor:'#214d70',shape:'blob',lite:true,orbitOnly:true,label:'售后助手'});
+  const motionPreference=window.matchMedia('(prefers-reduced-motion: reduce)');
+  // Preserve the licensed expression choreography; adjust only eye proportions and spacing.
+  const applyOriginalPose=ball.ball.applyPose.bind(ball.ball);
+  const adaptEye=(eye,side)=>({...eye,scaleX:eye.scaleX*1.1,scaleY:eye.scaleY*.94,x:eye.x+side*2.5});
+  ball.ball.applyPose=pose=>applyOriginalPose({...pose,left:adaptEye(pose.left,-1),right:adaptEye(pose.right,1)});
+  const effectsMount=document.createElement('div');
+  effectsMount.setAttribute('aria-hidden','true');
+  effectsMount.style.cssText='position:absolute;inset:0;pointer-events:none';
+  mount.parentElement.appendChild(effectsMount);
+  const workArcs=AftercareOrb.create(effectsMount,{effectsOnly:true});
+  window.workArcs=workArcs;
+  function updateMotion(reduced){
+    ball.setActive(!reduced);workArcs.setActive(!reduced);
+    if(reduced){ball.renderStatic();workArcs.renderStatic()}
+  }
+  updateMotion(motionPreference.matches);
+  motionPreference.addEventListener('change',event=>updateMotion(event.matches));
+  const descriptions={
+    idle:'空闲：Grok Ball 02 待机表情；球外无彩色环。',
+    listening:'倾听：Grok Ball 03 好奇表情；眼环按原引擎形变；球外无彩色环。',
+    understanding:'思考：Grok Ball 30 思考表情；保留原生眼环与视线动画，关闭引擎附加环带。',
+    working:'操作网页：Grok Ball 32 忙碌表情；独立设计的斜向双弧流动；两只小手错拍摆动。',
+    speaking:'正在说话：语音条只在 Agent 实际播报期间显示；此处波形为演示节奏。',
+    clarify:'需要确认：Grok Ball 11 疑惑表情；眼睛大小与方向不对称。',
+    waiting:'等待用户：Grok Ball 35 等待输入表情；眼睛上下扫读，球外无彩色环。'
+  };
+  document.querySelectorAll('.states button').forEach(button=>button.addEventListener('click',()=>{
+    const state=button.dataset.state;
+    assistant.dataset.state=state;
+    document.querySelector('.voice').setAttribute('aria-hidden',String(state!=='speaking'));
+    ball.setEmotion(button.dataset.emotion);
+    workArcs.setState(state);
+    document.querySelectorAll('.control').forEach(item=>item.setAttribute('aria-expanded','false'));
+    description.textContent=descriptions[state];
+    document.querySelectorAll('.states button').forEach(item=>item.setAttribute('aria-pressed',String(item===button)));
+  }));
+  assistant.addEventListener('pointermove',event=>{
+    const rect=mount.getBoundingClientRect();
+    ball.setGaze((event.clientX-(rect.left+rect.width/2))/(rect.width/2),(event.clientY-(rect.top+rect.height/2))/(rect.height/2));
+  });
+  assistant.addEventListener('pointerleave',()=>ball.clearGaze());
+  function toggleTag(button){
+    const wasOpen=button.getAttribute('aria-expanded')==='true';
+    document.querySelectorAll('.control').forEach(item=>item.setAttribute('aria-expanded','false'));
+    button.setAttribute('aria-expanded',String(!wasOpen));
+  }
+  document.addEventListener('keydown',event=>{if(event.key==='Escape')document.querySelectorAll('.control').forEach(item=>item.setAttribute('aria-expanded','false'))});
+  if(new URLSearchParams(location.search).get('poster')==='1')document.body.classList.add('poster');
+  const requestedState=new URLSearchParams(location.search).get('state');
+  const initialButton=[...document.querySelectorAll('.states button')].find(button=>button.dataset.state===requestedState);
+  if(initialButton)initialButton.click();
+</script>
+</body>
+</html>

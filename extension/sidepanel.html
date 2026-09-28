@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>售后助手</title><link rel="stylesheet" href="sidepanel.css"></head><body>
+<header><strong>售后助手</strong><span id="service-status">正在连接本机服务…</span></header>
+<div class="orb-entry"><span id="orb-status">悬浮球已在网页显示</span><button id="show-orb">显示悬浮球</button></div>
+<div class="modes" role="group" aria-label="协助方式"><button data-mode="self" class="selected">我自己操作</button><button data-mode="guided">陪我操作</button><button data-mode="auto">帮我准备</button></div>
+<div class="mode-note">模式会记录为偏好；网页自动操作尚未接入。</div>
+<div class="pagebox"><div class="pagehead"><strong>当前网页</strong><button id="capture" disabled>读取页面文字</button></div><div id="page-title" class="pagetitle">尚未读取</div><textarea id="page-text" placeholder="开启页面文字权限后，点击上方按钮读取；发送前可检查并删去内容。页面文字默认只留在本机。"></textarea></div>
+<div class="privacy">任务记录目前以未加密形式保存在本机，建议先用虚构资料试用。网页文字留在本机供你检查；勾选后才发送至阶跃星辰。不要粘贴密码、验证码或支付信息。当前不会自动点击、上传或提交。</div>
+<div id="thread" class="thread" aria-live="polite"></div>
+<div class="send-consent"><label><input id="remote-consent" type="checkbox"> 本轮允许将我的描述和上面的页面文字发送给阶跃星辰模型分析</label></div>
+<div class="composer"><textarea id="message" placeholder="说说哪件商品出了什么问题，或你卡在哪一步…"></textarea><button id="send">发送</button></div>
+<div class="taskbar"><button id="new-task">新建售后任务</button><span>任务记录保存在本机</span></div>
+<script src="sidepanel.js"></script>
+</body></html>

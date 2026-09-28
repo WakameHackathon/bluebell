@@ -1,0 +1,7040 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:aftercare:skill-contracts:1.0.0",
+  "title": "Aftercare project contracts (not the Agent Skills file-format standard)",
+  "$defs": {
+    "Money": {
+      "type": "object",
+      "properties": {
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        },
+        "minor_units": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "currency",
+        "minor_units"
+      ],
+      "additionalProperties": false
+    },
+    "Question": {
+      "type": "object",
+      "properties": {
+        "question_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "choices": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "value": {
+                "type": "string",
+                "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+              },
+              "label": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "value",
+              "label"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "question_id",
+        "text",
+        "choices"
+      ],
+      "additionalProperties": false
+    },
+    "Issue": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string",
+          "enum": [
+            "missing_input",
+            "stale_observation",
+            "target_unconfirmed",
+            "policy_unknown",
+            "needs_login",
+            "needs_consent",
+            "unsupported",
+            "ambiguous_result",
+            "budget_exhausted",
+            "contract_error",
+            "tool_failure",
+            "user_paused"
+          ]
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1
+        },
+        "retryable": {
+          "type": "boolean"
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+          }
+        }
+      },
+      "required": [
+        "code",
+        "message",
+        "retryable",
+        "evidence_refs"
+      ],
+      "additionalProperties": false
+    },
+    "Fact": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "value": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+          },
+          "minItems": 1
+        },
+        "certainty": {
+          "type": "string",
+          "enum": [
+            "observed",
+            "user_reported",
+            "inferred"
+          ]
+        }
+      },
+      "required": [
+        "key",
+        "value",
+        "evidence_refs",
+        "certainty"
+      ],
+      "additionalProperties": false
+    },
+    "Step": {
+      "type": "object",
+      "properties": {
+        "intent": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "required_evidence": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+          }
+        },
+        "next_skill_hint": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "intent",
+        "reason",
+        "required_evidence",
+        "next_skill_hint"
+      ],
+      "additionalProperties": false
+    },
+    "Action": {
+      "type": "object",
+      "properties": {
+        "proposal_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "task_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "target_item_ref": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "operation": {
+          "type": "string",
+          "enum": [
+            "navigate",
+            "expand",
+            "fill",
+            "select",
+            "attach",
+            "submit",
+            "withdraw",
+            "accept_offer",
+            "book_pickup",
+            "send_message"
+          ]
+        },
+        "observation_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "page_revision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "control_ref": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "value_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+          }
+        },
+        "effect": {
+          "type": "string",
+          "enum": [
+            "read_only",
+            "local_edit",
+            "external_write",
+            "unknown"
+          ]
+        },
+        "recipient_ref": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "material_content_ref": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+          },
+          "minItems": 1
+        },
+        "expected_result": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "proposal_id",
+        "task_id",
+        "target_item_ref",
+        "operation",
+        "observation_id",
+        "page_revision",
+        "control_ref",
+        "value_refs",
+        "effect",
+        "recipient_ref",
+        "material_content_ref",
+        "evidence_refs",
+        "expected_result"
+      ],
+      "additionalProperties": false
+    },
+    "Option": {
+      "type": "object",
+      "properties": {
+        "option_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "refund_only",
+            "return_refund",
+            "supplement",
+            "appeal",
+            "withdraw",
+            "accept_offer",
+            "contact_support"
+          ]
+        },
+        "explanation": {
+          "type": "string",
+          "minLength": 1
+        },
+        "conditions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Fact"
+          }
+        },
+        "consequences": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Fact"
+          }
+        },
+        "missing_facts": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+          }
+        }
+      },
+      "required": [
+        "option_id",
+        "kind",
+        "explanation",
+        "conditions",
+        "consequences",
+        "missing_facts"
+      ],
+      "additionalProperties": false
+    },
+    "Candidate": {
+      "type": "object",
+      "properties": {
+        "item_ref": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "display_label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "order_ref": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "item_ref",
+        "display_label",
+        "order_ref",
+        "evidence_refs"
+      ],
+      "additionalProperties": false
+    },
+    "TaskIntent": {
+      "type": "object",
+      "properties": {
+        "goal": {
+          "type": "string",
+          "minLength": 1
+        },
+        "scope": {
+          "const": "single_item_single_case"
+        },
+        "user_facts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Fact"
+          }
+        },
+        "requested_outcome": {
+          "type": "string",
+          "enum": [
+            "refund_only",
+            "return_refund",
+            "undecided"
+          ]
+        },
+        "missing_fields": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+          }
+        }
+      },
+      "required": [
+        "goal",
+        "scope",
+        "user_facts",
+        "requested_outcome",
+        "missing_fields"
+      ],
+      "additionalProperties": false
+    },
+    "OrderSelection": {
+      "type": "object",
+      "properties": {
+        "candidates": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Candidate"
+          }
+        },
+        "selected_item_ref": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "selection_receipt_ref": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "lookup_steps": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Step"
+          }
+        }
+      },
+      "required": [
+        "candidates",
+        "selected_item_ref",
+        "selection_receipt_ref",
+        "lookup_steps"
+      ],
+      "additionalProperties": false
+    },
+    "RemedyPlan": {
+      "type": "object",
+      "properties": {
+        "options": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Option"
+          }
+        },
+        "recommended_option_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "chosen_option_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "choice_receipt_ref": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "material_requirements": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Fact"
+          }
+        },
+        "next_steps": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Step"
+          }
+        }
+      },
+      "required": [
+        "options",
+        "recommended_option_id",
+        "chosen_option_id",
+        "choice_receipt_ref",
+        "material_requirements",
+        "next_steps"
+      ],
+      "additionalProperties": false
+    },
+    "EvidenceBundle": {
+      "type": "object",
+      "properties": {
+        "original_file_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+          }
+        },
+        "derived_files": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "file_ref": {
+                "type": "string",
+                "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+              },
+              "source_refs": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                }
+              },
+              "transforms": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "crop",
+                    "compress",
+                    "rotate",
+                    "redact"
+                  ]
+                }
+              },
+              "preview_ref": {
+                "type": "string",
+                "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+              }
+            },
+            "required": [
+              "file_ref",
+              "source_refs",
+              "transforms",
+              "preview_ref"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "requirement_checks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "requirement_key": {
+                "type": "string",
+                "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+              },
+              "state": {
+                "type": "string",
+                "enum": [
+                  "met",
+                  "missing",
+                  "uncertain"
+                ]
+              },
+              "evidence_refs": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                }
+              }
+            },
+            "required": [
+              "requirement_key",
+              "state",
+              "evidence_refs"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "capture_guidance": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "statement_draft": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "review_receipt_ref": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "original_file_refs",
+        "derived_files",
+        "requirement_checks",
+        "capture_guidance",
+        "statement_draft",
+        "review_receipt_ref"
+      ],
+      "additionalProperties": false
+    },
+    "InteractionPlan": {
+      "type": "object",
+      "properties": {
+        "presentation": {
+          "type": "string",
+          "enum": [
+            "explain_only",
+            "highlight",
+            "propose_action"
+          ]
+        },
+        "instruction": {
+          "type": "string",
+          "minLength": 1
+        },
+        "highlight_control_ref": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "actions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Action"
+          }
+        },
+        "refresh_required": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "presentation",
+        "instruction",
+        "highlight_control_ref",
+        "actions",
+        "refresh_required"
+      ],
+      "additionalProperties": false
+    },
+    "OutcomeReport": {
+      "type": "object",
+      "properties": {
+        "platform_state": {
+          "type": "string",
+          "enum": [
+            "not_started",
+            "draft",
+            "submitted",
+            "pending",
+            "needs_evidence",
+            "return_required",
+            "pickup_booked",
+            "in_transit",
+            "refund_processing",
+            "refund_reported_complete",
+            "rejected",
+            "closed",
+            "unknown"
+          ]
+        },
+        "effect_result": {
+          "type": "string",
+          "enum": [
+            "not_attempted",
+            "confirmed_success",
+            "confirmed_failure",
+            "unknown"
+          ]
+        },
+        "stage_complete": {
+          "type": "boolean"
+        },
+        "case_terminal": {
+          "type": "boolean"
+        },
+        "business_result": {
+          "type": "string",
+          "enum": [
+            "not_final",
+            "refund_reported",
+            "final_rejection",
+            "user_withdrawn",
+            "other_final",
+            "unknown"
+          ]
+        },
+        "actual_receipt_confirmed": {
+          "type": "string",
+          "enum": [
+            "yes",
+            "no",
+            "unknown"
+          ]
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+          }
+        },
+        "user_todos": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Step"
+          }
+        }
+      },
+      "required": [
+        "platform_state",
+        "effect_result",
+        "stage_complete",
+        "case_terminal",
+        "business_result",
+        "actual_receipt_confirmed",
+        "evidence_refs",
+        "user_todos"
+      ],
+      "additionalProperties": false
+    },
+    "RecoveryPlan": {
+      "type": "object",
+      "properties": {
+        "failure_class": {
+          "type": "string",
+          "enum": [
+            "layout_changed",
+            "stale_target",
+            "overlay",
+            "navigation_lost",
+            "network_error",
+            "ambiguous_write",
+            "unsupported",
+            "other"
+          ]
+        },
+        "strategy": {
+          "type": "string",
+          "enum": [
+            "reobserve",
+            "relocalize",
+            "reversible_explore",
+            "check_records",
+            "ask_user",
+            "handoff",
+            "stop"
+          ]
+        },
+        "new_evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+          }
+        },
+        "next_steps": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Step"
+          }
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "failure_class",
+        "strategy",
+        "new_evidence_refs",
+        "next_steps",
+        "reason"
+      ],
+      "additionalProperties": false
+    },
+    "ResumePlan": {
+      "type": "object",
+      "properties": {
+        "mismatches": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "field": {
+                "type": "string",
+                "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+              },
+              "previous_evidence_ref": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "current_evidence_ref": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "resolution": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "field",
+              "previous_evidence_ref",
+              "current_evidence_ref",
+              "resolution"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "confirmed_target_item_ref": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "latest_outcome_ref": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "next_steps": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Step"
+          }
+        },
+        "historical_consent_reusable": {
+          "const": false
+        }
+      },
+      "required": [
+        "mismatches",
+        "confirmed_target_item_ref",
+        "latest_outcome_ref",
+        "next_steps",
+        "historical_consent_reusable"
+      ],
+      "additionalProperties": false
+    },
+    "LogisticsPlan": {
+      "type": "object",
+      "properties": {
+        "stage": {
+          "type": "string",
+          "enum": [
+            "not_ready",
+            "prepare_pickup",
+            "await_user_shipping",
+            "tracking",
+            "problem"
+          ]
+        },
+        "address_ref": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "time_slot_ref": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "fee": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Money"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "fee_known": {
+          "type": "boolean"
+        },
+        "tracking_ref": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "user_todos": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Step"
+          }
+        },
+        "next_steps": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Step"
+          }
+        }
+      },
+      "required": [
+        "stage",
+        "address_ref",
+        "time_slot_ref",
+        "fee",
+        "fee_known",
+        "tracking_ref",
+        "user_todos",
+        "next_steps"
+      ],
+      "additionalProperties": false
+    },
+    "AppealDraft": {
+      "type": "object",
+      "properties": {
+        "reason_evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+          }
+        },
+        "grounds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Fact"
+          }
+        },
+        "draft_text": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "file_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+          }
+        },
+        "missing_evidence": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "available_route_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+          }
+        },
+        "recommendation": {
+          "type": "string",
+          "enum": [
+            "prepare",
+            "collect_more",
+            "handoff",
+            "stop"
+          ]
+        }
+      },
+      "required": [
+        "reason_evidence_refs",
+        "grounds",
+        "draft_text",
+        "file_refs",
+        "missing_evidence",
+        "available_route_refs",
+        "recommendation"
+      ],
+      "additionalProperties": false
+    },
+    "HandoffDraft": {
+      "type": "object",
+      "properties": {
+        "official_channel_ref": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "timeline_evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+          }
+        },
+        "unresolved_questions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "message_draft": {
+          "type": "string",
+          "minLength": 1
+        },
+        "file_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+          }
+        }
+      },
+      "required": [
+        "official_channel_ref",
+        "summary",
+        "timeline_evidence_refs",
+        "unresolved_questions",
+        "message_draft",
+        "file_refs"
+      ],
+      "additionalProperties": false
+    },
+    "PlatformView": {
+      "type": "object",
+      "properties": {
+        "platform_key": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "environment": {
+          "type": "string",
+          "enum": [
+            "real",
+            "sandbox"
+          ]
+        },
+        "page_kind": {
+          "type": "string",
+          "enum": [
+            "orders",
+            "order_detail",
+            "aftersales",
+            "upload",
+            "status",
+            "logistics",
+            "appeal",
+            "support",
+            "login",
+            "unknown"
+          ]
+        },
+        "supported_operations": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "unsupported_operations": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "state_facts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Fact"
+          }
+        },
+        "rules": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Fact"
+          }
+        },
+        "controls": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "control_ref": {
+                "type": "string",
+                "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+              },
+              "semantic_role": {
+                "type": "string",
+                "minLength": 1
+              },
+              "visible_label": {
+                "type": "string",
+                "minLength": 1
+              },
+              "observation_id": {
+                "type": "string",
+                "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+              },
+              "page_revision": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "effect": {
+                "type": "string",
+                "enum": [
+                  "read_only",
+                  "local_edit",
+                  "external_write",
+                  "unknown"
+                ]
+              },
+              "evidence_refs": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                }
+              }
+            },
+            "required": [
+              "control_ref",
+              "semantic_role",
+              "visible_label",
+              "observation_id",
+              "page_revision",
+              "effect",
+              "evidence_refs"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "expires_on_page_change": {
+          "const": true
+        }
+      },
+      "required": [
+        "platform_key",
+        "environment",
+        "page_kind",
+        "supported_operations",
+        "unsupported_operations",
+        "state_facts",
+        "rules",
+        "controls",
+        "expires_on_page_change"
+      ],
+      "additionalProperties": false
+    },
+    "UserTurnRef": {
+      "type": "object",
+      "properties": {
+        "artifact_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "kind": {
+          "const": "UserTurn"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "artifact_id",
+        "kind",
+        "revision"
+      ],
+      "additionalProperties": false
+    },
+    "TaskSnapshotRef": {
+      "type": "object",
+      "properties": {
+        "artifact_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "kind": {
+          "const": "TaskSnapshot"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "artifact_id",
+        "kind",
+        "revision"
+      ],
+      "additionalProperties": false
+    },
+    "ObservationRef": {
+      "type": "object",
+      "properties": {
+        "artifact_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "kind": {
+          "const": "Observation"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "artifact_id",
+        "kind",
+        "revision"
+      ],
+      "additionalProperties": false
+    },
+    "ExecutionReceiptRef": {
+      "type": "object",
+      "properties": {
+        "artifact_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "kind": {
+          "const": "ExecutionReceipt"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "artifact_id",
+        "kind",
+        "revision"
+      ],
+      "additionalProperties": false
+    },
+    "OperationLedgerRef": {
+      "type": "object",
+      "properties": {
+        "artifact_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "kind": {
+          "const": "OperationLedger"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "artifact_id",
+        "kind",
+        "revision"
+      ],
+      "additionalProperties": false
+    },
+    "UserDecisionRef": {
+      "type": "object",
+      "properties": {
+        "artifact_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "kind": {
+          "const": "UserDecision"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "artifact_id",
+        "kind",
+        "revision"
+      ],
+      "additionalProperties": false
+    },
+    "FailureEventRef": {
+      "type": "object",
+      "properties": {
+        "artifact_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "kind": {
+          "const": "FailureEvent"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "artifact_id",
+        "kind",
+        "revision"
+      ],
+      "additionalProperties": false
+    },
+    "UserTurn": {
+      "type": "object",
+      "properties": {
+        "event_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "task_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "occurred_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "channel": {
+          "type": "string",
+          "enum": [
+            "text",
+            "asr"
+          ]
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "audio_ref": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "transfer_grant_ref": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "recognition_uncertain": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "event_id",
+        "task_id",
+        "occurred_at",
+        "channel",
+        "text",
+        "audio_ref",
+        "transfer_grant_ref",
+        "recognition_uncertain"
+      ],
+      "additionalProperties": false
+    },
+    "TaskSnapshot": {
+      "type": "object",
+      "properties": {
+        "task_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "task_revision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "target_item_ref": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "selection_receipt_ref": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "intent_ref": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "artifact_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "kind": {
+                  "const": "TaskIntent"
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "artifact_id",
+                "kind",
+                "revision"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "remedy_ref": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "artifact_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "kind": {
+                  "const": "RemedyPlan"
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "artifact_id",
+                "kind",
+                "revision"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "outcome_ref": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "artifact_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "kind": {
+                  "const": "OutcomeReport"
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "artifact_id",
+                "kind",
+                "revision"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "self",
+            "guided",
+            "auto"
+          ]
+        },
+        "paused": {
+          "type": "boolean"
+        },
+        "remaining_budget": {
+          "type": "object",
+          "properties": {
+            "actions": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "recovery_attempts": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "deadline_at": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          "required": [
+            "actions",
+            "recovery_attempts",
+            "deadline_at"
+          ],
+          "additionalProperties": false
+        },
+        "scope_grant_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+          }
+        },
+        "pending_execution_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+          }
+        },
+        "related_artifact_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+          }
+        }
+      },
+      "required": [
+        "task_id",
+        "task_revision",
+        "target_item_ref",
+        "selection_receipt_ref",
+        "intent_ref",
+        "remedy_ref",
+        "outcome_ref",
+        "mode",
+        "paused",
+        "remaining_budget",
+        "scope_grant_refs",
+        "pending_execution_refs",
+        "related_artifact_refs"
+      ],
+      "additionalProperties": false
+    },
+    "Observation": {
+      "type": "object",
+      "properties": {
+        "observation_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "task_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "tab_ref": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "origin": {
+          "type": "string",
+          "minLength": 1
+        },
+        "page_revision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "captured_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "dom_fragment_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+          }
+        },
+        "screenshot_region_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+          }
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+          }
+        },
+        "official_identity": {
+          "type": "string",
+          "enum": [
+            "verified",
+            "unverified",
+            "not_applicable"
+          ]
+        }
+      },
+      "required": [
+        "observation_id",
+        "task_id",
+        "tab_ref",
+        "origin",
+        "page_revision",
+        "captured_at",
+        "dom_fragment_refs",
+        "screenshot_region_refs",
+        "evidence_refs",
+        "official_identity"
+      ],
+      "additionalProperties": false
+    },
+    "ExecutionReceipt": {
+      "type": "object",
+      "properties": {
+        "execution_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "proposal_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "task_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "target_item_ref": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "action_payload_digest": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "confirmation_ref": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "observation_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "page_revision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "dispatch_state": {
+          "type": "string",
+          "enum": [
+            "not_sent",
+            "sent",
+            "unknown"
+          ]
+        },
+        "tool_state": {
+          "type": "string",
+          "enum": [
+            "not_started",
+            "running",
+            "succeeded",
+            "failed",
+            "unknown"
+          ]
+        },
+        "started_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "finished_at": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date-time"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "result_evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+          }
+        }
+      },
+      "required": [
+        "execution_id",
+        "proposal_id",
+        "task_id",
+        "target_item_ref",
+        "action_payload_digest",
+        "confirmation_ref",
+        "observation_id",
+        "page_revision",
+        "dispatch_state",
+        "tool_state",
+        "started_at",
+        "finished_at",
+        "result_evidence_refs"
+      ],
+      "additionalProperties": false
+    },
+    "OperationLedger": {
+      "type": "object",
+      "properties": {
+        "task_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "ledger_revision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "events": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "event_id": {
+                "type": "string",
+                "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+              },
+              "occurred_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "event_type": {
+                "type": "string",
+                "enum": [
+                  "planned",
+                  "authorized",
+                  "dispatch_started",
+                  "tool_returned",
+                  "verified",
+                  "paused",
+                  "resumed",
+                  "mode_changed",
+                  "target_changed"
+                ]
+              },
+              "execution_ref": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "evidence_refs": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                }
+              }
+            },
+            "required": [
+              "event_id",
+              "occurred_at",
+              "event_type",
+              "execution_ref",
+              "evidence_refs"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "task_id",
+        "ledger_revision",
+        "events"
+      ],
+      "additionalProperties": false
+    },
+    "UserDecision": {
+      "type": "object",
+      "properties": {
+        "decision_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "task_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "user_event_ref": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "decision_kind": {
+          "type": "string",
+          "enum": [
+            "select_item",
+            "choose_option",
+            "confirm_fact",
+            "review_material"
+          ]
+        },
+        "subject_ref": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "selected_value_ref": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "based_on_task_revision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "recorded_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "decision_id",
+        "task_id",
+        "user_event_ref",
+        "decision_kind",
+        "subject_ref",
+        "selected_value_ref",
+        "based_on_task_revision",
+        "recorded_at"
+      ],
+      "additionalProperties": false
+    },
+    "FailureEvent": {
+      "type": "object",
+      "properties": {
+        "failure_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "task_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "call_ref": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "execution_ref": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "dispatch_state": {
+          "type": "string",
+          "enum": [
+            "not_sent",
+            "sent",
+            "unknown"
+          ]
+        },
+        "code": {
+          "type": "string",
+          "enum": [
+            "page_changed",
+            "target_missing",
+            "overlay",
+            "timeout",
+            "network",
+            "unsupported",
+            "tool_error",
+            "other"
+          ]
+        },
+        "observation_ref": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "artifact_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "kind": {
+                  "const": "Observation"
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "artifact_id",
+                "kind",
+                "revision"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "occurred_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "failure_id",
+        "task_id",
+        "call_ref",
+        "execution_ref",
+        "dispatch_state",
+        "code",
+        "observation_ref",
+        "occurred_at"
+      ],
+      "additionalProperties": false
+    },
+    "aftercare-intakeRequest": {
+      "type": "object",
+      "properties": {
+        "contract_version": {
+          "const": "1.0.0"
+        },
+        "skill_id": {
+          "const": "aftercare-intake"
+        },
+        "skill_version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "call_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "task_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "expected_task_revision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "self",
+            "guided",
+            "auto"
+          ]
+        },
+        "task_snapshot": {
+          "type": "object",
+          "properties": {
+            "artifact_id": {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+            },
+            "kind": {
+              "const": "TaskSnapshot"
+            },
+            "revision": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "artifact_id",
+            "kind",
+            "revision"
+          ],
+          "additionalProperties": false
+        },
+        "inputs": {
+          "type": "object",
+          "properties": {
+            "user_turn": {
+              "type": "object",
+              "properties": {
+                "artifact_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "kind": {
+                  "const": "UserTurn"
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "artifact_id",
+                "kind",
+                "revision"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "user_turn"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "contract_version",
+        "skill_id",
+        "skill_version",
+        "call_id",
+        "task_id",
+        "expected_task_revision",
+        "mode",
+        "task_snapshot",
+        "inputs"
+      ],
+      "additionalProperties": false
+    },
+    "aftercare-intakeResult": {
+      "type": "object",
+      "properties": {
+        "contract_version": {
+          "const": "1.0.0"
+        },
+        "skill_id": {
+          "const": "aftercare-intake"
+        },
+        "call_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "task_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "based_on_task_revision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "completed",
+            "needs_user",
+            "needs_observation",
+            "blocked",
+            "failed"
+          ]
+        },
+        "data": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TaskIntent"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "questions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Question"
+          }
+        },
+        "issues": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Issue"
+          }
+        },
+        "user_message": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "contract_version",
+        "skill_id",
+        "call_id",
+        "task_id",
+        "based_on_task_revision",
+        "status",
+        "data",
+        "questions",
+        "issues",
+        "user_message"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "completed"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "data": {
+                "$ref": "#/$defs/TaskIntent"
+              },
+              "questions": {
+                "maxItems": 0
+              },
+              "issues": {
+                "maxItems": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "needs_user"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "questions": {
+                "minItems": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": [
+                  "needs_observation",
+                  "blocked",
+                  "failed"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "issues": {
+                "minItems": 1
+              }
+            }
+          }
+        }
+      ]
+    },
+    "aftercare-orderRequest": {
+      "type": "object",
+      "properties": {
+        "contract_version": {
+          "const": "1.0.0"
+        },
+        "skill_id": {
+          "const": "aftercare-order"
+        },
+        "skill_version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "call_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "task_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "expected_task_revision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "self",
+            "guided",
+            "auto"
+          ]
+        },
+        "task_snapshot": {
+          "type": "object",
+          "properties": {
+            "artifact_id": {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+            },
+            "kind": {
+              "const": "TaskSnapshot"
+            },
+            "revision": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "artifact_id",
+            "kind",
+            "revision"
+          ],
+          "additionalProperties": false
+        },
+        "inputs": {
+          "type": "object",
+          "properties": {
+            "intent": {
+              "type": "object",
+              "properties": {
+                "artifact_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "kind": {
+                  "const": "TaskIntent"
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "artifact_id",
+                "kind",
+                "revision"
+              ],
+              "additionalProperties": false
+            },
+            "platform_view": {
+              "type": "object",
+              "properties": {
+                "artifact_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "kind": {
+                  "const": "PlatformView"
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "artifact_id",
+                "kind",
+                "revision"
+              ],
+              "additionalProperties": false
+            },
+            "user_decision": {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "artifact_id": {
+                      "type": "string",
+                      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                    },
+                    "kind": {
+                      "const": "UserDecision"
+                    },
+                    "revision": {
+                      "type": "integer",
+                      "minimum": 0
+                    }
+                  },
+                  "required": [
+                    "artifact_id",
+                    "kind",
+                    "revision"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "intent",
+            "platform_view",
+            "user_decision"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "contract_version",
+        "skill_id",
+        "skill_version",
+        "call_id",
+        "task_id",
+        "expected_task_revision",
+        "mode",
+        "task_snapshot",
+        "inputs"
+      ],
+      "additionalProperties": false
+    },
+    "aftercare-orderResult": {
+      "type": "object",
+      "properties": {
+        "contract_version": {
+          "const": "1.0.0"
+        },
+        "skill_id": {
+          "const": "aftercare-order"
+        },
+        "call_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "task_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "based_on_task_revision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "completed",
+            "needs_user",
+            "needs_observation",
+            "blocked",
+            "failed"
+          ]
+        },
+        "data": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/OrderSelection"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "questions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Question"
+          }
+        },
+        "issues": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Issue"
+          }
+        },
+        "user_message": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "contract_version",
+        "skill_id",
+        "call_id",
+        "task_id",
+        "based_on_task_revision",
+        "status",
+        "data",
+        "questions",
+        "issues",
+        "user_message"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "completed"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "data": {
+                "$ref": "#/$defs/OrderSelection"
+              },
+              "questions": {
+                "maxItems": 0
+              },
+              "issues": {
+                "maxItems": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "needs_user"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "questions": {
+                "minItems": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": [
+                  "needs_observation",
+                  "blocked",
+                  "failed"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "issues": {
+                "minItems": 1
+              }
+            }
+          }
+        }
+      ]
+    },
+    "aftercare-remedyRequest": {
+      "type": "object",
+      "properties": {
+        "contract_version": {
+          "const": "1.0.0"
+        },
+        "skill_id": {
+          "const": "aftercare-remedy"
+        },
+        "skill_version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "call_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "task_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "expected_task_revision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "self",
+            "guided",
+            "auto"
+          ]
+        },
+        "task_snapshot": {
+          "type": "object",
+          "properties": {
+            "artifact_id": {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+            },
+            "kind": {
+              "const": "TaskSnapshot"
+            },
+            "revision": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "artifact_id",
+            "kind",
+            "revision"
+          ],
+          "additionalProperties": false
+        },
+        "inputs": {
+          "type": "object",
+          "properties": {
+            "intent": {
+              "type": "object",
+              "properties": {
+                "artifact_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "kind": {
+                  "const": "TaskIntent"
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "artifact_id",
+                "kind",
+                "revision"
+              ],
+              "additionalProperties": false
+            },
+            "order": {
+              "type": "object",
+              "properties": {
+                "artifact_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "kind": {
+                  "const": "OrderSelection"
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "artifact_id",
+                "kind",
+                "revision"
+              ],
+              "additionalProperties": false
+            },
+            "platform_view": {
+              "type": "object",
+              "properties": {
+                "artifact_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "kind": {
+                  "const": "PlatformView"
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "artifact_id",
+                "kind",
+                "revision"
+              ],
+              "additionalProperties": false
+            },
+            "user_decision": {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "artifact_id": {
+                      "type": "string",
+                      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                    },
+                    "kind": {
+                      "const": "UserDecision"
+                    },
+                    "revision": {
+                      "type": "integer",
+                      "minimum": 0
+                    }
+                  },
+                  "required": [
+                    "artifact_id",
+                    "kind",
+                    "revision"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "intent",
+            "order",
+            "platform_view",
+            "user_decision"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "contract_version",
+        "skill_id",
+        "skill_version",
+        "call_id",
+        "task_id",
+        "expected_task_revision",
+        "mode",
+        "task_snapshot",
+        "inputs"
+      ],
+      "additionalProperties": false
+    },
+    "aftercare-remedyResult": {
+      "type": "object",
+      "properties": {
+        "contract_version": {
+          "const": "1.0.0"
+        },
+        "skill_id": {
+          "const": "aftercare-remedy"
+        },
+        "call_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "task_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "based_on_task_revision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "completed",
+            "needs_user",
+            "needs_observation",
+            "blocked",
+            "failed"
+          ]
+        },
+        "data": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RemedyPlan"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "questions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Question"
+          }
+        },
+        "issues": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Issue"
+          }
+        },
+        "user_message": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "contract_version",
+        "skill_id",
+        "call_id",
+        "task_id",
+        "based_on_task_revision",
+        "status",
+        "data",
+        "questions",
+        "issues",
+        "user_message"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "completed"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "data": {
+                "$ref": "#/$defs/RemedyPlan"
+              },
+              "questions": {
+                "maxItems": 0
+              },
+              "issues": {
+                "maxItems": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "needs_user"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "questions": {
+                "minItems": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": [
+                  "needs_observation",
+                  "blocked",
+                  "failed"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "issues": {
+                "minItems": 1
+              }
+            }
+          }
+        }
+      ]
+    },
+    "aftercare-evidenceRequest": {
+      "type": "object",
+      "properties": {
+        "contract_version": {
+          "const": "1.0.0"
+        },
+        "skill_id": {
+          "const": "aftercare-evidence"
+        },
+        "skill_version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "call_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "task_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "expected_task_revision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "self",
+            "guided",
+            "auto"
+          ]
+        },
+        "task_snapshot": {
+          "type": "object",
+          "properties": {
+            "artifact_id": {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+            },
+            "kind": {
+              "const": "TaskSnapshot"
+            },
+            "revision": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "artifact_id",
+            "kind",
+            "revision"
+          ],
+          "additionalProperties": false
+        },
+        "inputs": {
+          "type": "object",
+          "properties": {
+            "remedy": {
+              "type": "object",
+              "properties": {
+                "artifact_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "kind": {
+                  "const": "RemedyPlan"
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "artifact_id",
+                "kind",
+                "revision"
+              ],
+              "additionalProperties": false
+            },
+            "platform_view": {
+              "type": "object",
+              "properties": {
+                "artifact_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "kind": {
+                  "const": "PlatformView"
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "artifact_id",
+                "kind",
+                "revision"
+              ],
+              "additionalProperties": false
+            },
+            "approved_file_refs": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+              }
+            },
+            "user_turn": {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "artifact_id": {
+                      "type": "string",
+                      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                    },
+                    "kind": {
+                      "const": "UserTurn"
+                    },
+                    "revision": {
+                      "type": "integer",
+                      "minimum": 0
+                    }
+                  },
+                  "required": [
+                    "artifact_id",
+                    "kind",
+                    "revision"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "remedy",
+            "platform_view",
+            "approved_file_refs",
+            "user_turn"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "contract_version",
+        "skill_id",
+        "skill_version",
+        "call_id",
+        "task_id",
+        "expected_task_revision",
+        "mode",
+        "task_snapshot",
+        "inputs"
+      ],
+      "additionalProperties": false
+    },
+    "aftercare-evidenceResult": {
+      "type": "object",
+      "properties": {
+        "contract_version": {
+          "const": "1.0.0"
+        },
+        "skill_id": {
+          "const": "aftercare-evidence"
+        },
+        "call_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "task_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "based_on_task_revision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "completed",
+            "needs_user",
+            "needs_observation",
+            "blocked",
+            "failed"
+          ]
+        },
+        "data": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/EvidenceBundle"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "questions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Question"
+          }
+        },
+        "issues": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Issue"
+          }
+        },
+        "user_message": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "contract_version",
+        "skill_id",
+        "call_id",
+        "task_id",
+        "based_on_task_revision",
+        "status",
+        "data",
+        "questions",
+        "issues",
+        "user_message"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "completed"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "data": {
+                "$ref": "#/$defs/EvidenceBundle"
+              },
+              "questions": {
+                "maxItems": 0
+              },
+              "issues": {
+                "maxItems": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "needs_user"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "questions": {
+                "minItems": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": [
+                  "needs_observation",
+                  "blocked",
+                  "failed"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "issues": {
+                "minItems": 1
+              }
+            }
+          }
+        }
+      ]
+    },
+    "aftercare-interactRequest": {
+      "type": "object",
+      "properties": {
+        "contract_version": {
+          "const": "1.0.0"
+        },
+        "skill_id": {
+          "const": "aftercare-interact"
+        },
+        "skill_version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "call_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "task_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "expected_task_revision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "self",
+            "guided",
+            "auto"
+          ]
+        },
+        "task_snapshot": {
+          "type": "object",
+          "properties": {
+            "artifact_id": {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+            },
+            "kind": {
+              "const": "TaskSnapshot"
+            },
+            "revision": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "artifact_id",
+            "kind",
+            "revision"
+          ],
+          "additionalProperties": false
+        },
+        "inputs": {
+          "type": "object",
+          "properties": {
+            "goal_step": {
+              "$ref": "#/$defs/Step"
+            },
+            "platform_view": {
+              "type": "object",
+              "properties": {
+                "artifact_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "kind": {
+                  "const": "PlatformView"
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "artifact_id",
+                "kind",
+                "revision"
+              ],
+              "additionalProperties": false
+            },
+            "source_artifacts": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "artifact_id": {
+                    "type": "string",
+                    "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                  },
+                  "kind": {
+                    "type": "string",
+                    "enum": [
+                      "TaskIntent",
+                      "OrderSelection",
+                      "RemedyPlan",
+                      "EvidenceBundle",
+                      "RecoveryPlan",
+                      "ResumePlan",
+                      "LogisticsPlan",
+                      "AppealDraft",
+                      "HandoffDraft"
+                    ]
+                  },
+                  "revision": {
+                    "type": "integer",
+                    "minimum": 0
+                  }
+                },
+                "required": [
+                  "artifact_id",
+                  "kind",
+                  "revision"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": [
+            "goal_step",
+            "platform_view",
+            "source_artifacts"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "contract_version",
+        "skill_id",
+        "skill_version",
+        "call_id",
+        "task_id",
+        "expected_task_revision",
+        "mode",
+        "task_snapshot",
+        "inputs"
+      ],
+      "additionalProperties": false
+    },
+    "aftercare-interactResult": {
+      "type": "object",
+      "properties": {
+        "contract_version": {
+          "const": "1.0.0"
+        },
+        "skill_id": {
+          "const": "aftercare-interact"
+        },
+        "call_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "task_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "based_on_task_revision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "completed",
+            "needs_user",
+            "needs_observation",
+            "blocked",
+            "failed"
+          ]
+        },
+        "data": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/InteractionPlan"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "questions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Question"
+          }
+        },
+        "issues": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Issue"
+          }
+        },
+        "user_message": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "contract_version",
+        "skill_id",
+        "call_id",
+        "task_id",
+        "based_on_task_revision",
+        "status",
+        "data",
+        "questions",
+        "issues",
+        "user_message"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "completed"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "data": {
+                "$ref": "#/$defs/InteractionPlan"
+              },
+              "questions": {
+                "maxItems": 0
+              },
+              "issues": {
+                "maxItems": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "needs_user"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "questions": {
+                "minItems": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": [
+                  "needs_observation",
+                  "blocked",
+                  "failed"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "issues": {
+                "minItems": 1
+              }
+            }
+          }
+        }
+      ]
+    },
+    "aftercare-verifyRequest": {
+      "type": "object",
+      "properties": {
+        "contract_version": {
+          "const": "1.0.0"
+        },
+        "skill_id": {
+          "const": "aftercare-verify"
+        },
+        "skill_version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "call_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "task_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "expected_task_revision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "self",
+            "guided",
+            "auto"
+          ]
+        },
+        "task_snapshot": {
+          "type": "object",
+          "properties": {
+            "artifact_id": {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+            },
+            "kind": {
+              "const": "TaskSnapshot"
+            },
+            "revision": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "artifact_id",
+            "kind",
+            "revision"
+          ],
+          "additionalProperties": false
+        },
+        "inputs": {
+          "type": "object",
+          "properties": {
+            "platform_view": {
+              "type": "object",
+              "properties": {
+                "artifact_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "kind": {
+                  "const": "PlatformView"
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "artifact_id",
+                "kind",
+                "revision"
+              ],
+              "additionalProperties": false
+            },
+            "receipt": {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "artifact_id": {
+                      "type": "string",
+                      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                    },
+                    "kind": {
+                      "const": "ExecutionReceipt"
+                    },
+                    "revision": {
+                      "type": "integer",
+                      "minimum": 0
+                    }
+                  },
+                  "required": [
+                    "artifact_id",
+                    "kind",
+                    "revision"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "ledger": {
+              "type": "object",
+              "properties": {
+                "artifact_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "kind": {
+                  "const": "OperationLedger"
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "artifact_id",
+                "kind",
+                "revision"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "platform_view",
+            "receipt",
+            "ledger"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "contract_version",
+        "skill_id",
+        "skill_version",
+        "call_id",
+        "task_id",
+        "expected_task_revision",
+        "mode",
+        "task_snapshot",
+        "inputs"
+      ],
+      "additionalProperties": false
+    },
+    "aftercare-verifyResult": {
+      "type": "object",
+      "properties": {
+        "contract_version": {
+          "const": "1.0.0"
+        },
+        "skill_id": {
+          "const": "aftercare-verify"
+        },
+        "call_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "task_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "based_on_task_revision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "completed",
+            "needs_user",
+            "needs_observation",
+            "blocked",
+            "failed"
+          ]
+        },
+        "data": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/OutcomeReport"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "questions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Question"
+          }
+        },
+        "issues": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Issue"
+          }
+        },
+        "user_message": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "contract_version",
+        "skill_id",
+        "call_id",
+        "task_id",
+        "based_on_task_revision",
+        "status",
+        "data",
+        "questions",
+        "issues",
+        "user_message"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "completed"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "data": {
+                "$ref": "#/$defs/OutcomeReport"
+              },
+              "questions": {
+                "maxItems": 0
+              },
+              "issues": {
+                "maxItems": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "needs_user"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "questions": {
+                "minItems": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": [
+                  "needs_observation",
+                  "blocked",
+                  "failed"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "issues": {
+                "minItems": 1
+              }
+            }
+          }
+        }
+      ]
+    },
+    "aftercare-recoverRequest": {
+      "type": "object",
+      "properties": {
+        "contract_version": {
+          "const": "1.0.0"
+        },
+        "skill_id": {
+          "const": "aftercare-recover"
+        },
+        "skill_version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "call_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "task_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "expected_task_revision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "self",
+            "guided",
+            "auto"
+          ]
+        },
+        "task_snapshot": {
+          "type": "object",
+          "properties": {
+            "artifact_id": {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+            },
+            "kind": {
+              "const": "TaskSnapshot"
+            },
+            "revision": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "artifact_id",
+            "kind",
+            "revision"
+          ],
+          "additionalProperties": false
+        },
+        "inputs": {
+          "type": "object",
+          "properties": {
+            "failure": {
+              "type": "object",
+              "properties": {
+                "artifact_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "kind": {
+                  "const": "FailureEvent"
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "artifact_id",
+                "kind",
+                "revision"
+              ],
+              "additionalProperties": false
+            },
+            "platform_view": {
+              "type": "object",
+              "properties": {
+                "artifact_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "kind": {
+                  "const": "PlatformView"
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "artifact_id",
+                "kind",
+                "revision"
+              ],
+              "additionalProperties": false
+            },
+            "ledger": {
+              "type": "object",
+              "properties": {
+                "artifact_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "kind": {
+                  "const": "OperationLedger"
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "artifact_id",
+                "kind",
+                "revision"
+              ],
+              "additionalProperties": false
+            },
+            "outcome": {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "artifact_id": {
+                      "type": "string",
+                      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                    },
+                    "kind": {
+                      "const": "OutcomeReport"
+                    },
+                    "revision": {
+                      "type": "integer",
+                      "minimum": 0
+                    }
+                  },
+                  "required": [
+                    "artifact_id",
+                    "kind",
+                    "revision"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "failure",
+            "platform_view",
+            "ledger",
+            "outcome"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "contract_version",
+        "skill_id",
+        "skill_version",
+        "call_id",
+        "task_id",
+        "expected_task_revision",
+        "mode",
+        "task_snapshot",
+        "inputs"
+      ],
+      "additionalProperties": false
+    },
+    "aftercare-recoverResult": {
+      "type": "object",
+      "properties": {
+        "contract_version": {
+          "const": "1.0.0"
+        },
+        "skill_id": {
+          "const": "aftercare-recover"
+        },
+        "call_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "task_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "based_on_task_revision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "completed",
+            "needs_user",
+            "needs_observation",
+            "blocked",
+            "failed"
+          ]
+        },
+        "data": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RecoveryPlan"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "questions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Question"
+          }
+        },
+        "issues": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Issue"
+          }
+        },
+        "user_message": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "contract_version",
+        "skill_id",
+        "call_id",
+        "task_id",
+        "based_on_task_revision",
+        "status",
+        "data",
+        "questions",
+        "issues",
+        "user_message"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "completed"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "data": {
+                "$ref": "#/$defs/RecoveryPlan"
+              },
+              "questions": {
+                "maxItems": 0
+              },
+              "issues": {
+                "maxItems": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "needs_user"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "questions": {
+                "minItems": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": [
+                  "needs_observation",
+                  "blocked",
+                  "failed"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "issues": {
+                "minItems": 1
+              }
+            }
+          }
+        }
+      ]
+    },
+    "aftercare-resumeRequest": {
+      "type": "object",
+      "properties": {
+        "contract_version": {
+          "const": "1.0.0"
+        },
+        "skill_id": {
+          "const": "aftercare-resume"
+        },
+        "skill_version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "call_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "task_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "expected_task_revision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "self",
+            "guided",
+            "auto"
+          ]
+        },
+        "task_snapshot": {
+          "type": "object",
+          "properties": {
+            "artifact_id": {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+            },
+            "kind": {
+              "const": "TaskSnapshot"
+            },
+            "revision": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "artifact_id",
+            "kind",
+            "revision"
+          ],
+          "additionalProperties": false
+        },
+        "inputs": {
+          "type": "object",
+          "properties": {
+            "saved_task": {
+              "type": "object",
+              "properties": {
+                "artifact_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "kind": {
+                  "const": "TaskSnapshot"
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "artifact_id",
+                "kind",
+                "revision"
+              ],
+              "additionalProperties": false
+            },
+            "platform_view": {
+              "type": "object",
+              "properties": {
+                "artifact_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "kind": {
+                  "const": "PlatformView"
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "artifact_id",
+                "kind",
+                "revision"
+              ],
+              "additionalProperties": false
+            },
+            "current_outcome": {
+              "type": "object",
+              "properties": {
+                "artifact_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "kind": {
+                  "const": "OutcomeReport"
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "artifact_id",
+                "kind",
+                "revision"
+              ],
+              "additionalProperties": false
+            },
+            "ledger": {
+              "type": "object",
+              "properties": {
+                "artifact_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "kind": {
+                  "const": "OperationLedger"
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "artifact_id",
+                "kind",
+                "revision"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "saved_task",
+            "platform_view",
+            "current_outcome",
+            "ledger"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "contract_version",
+        "skill_id",
+        "skill_version",
+        "call_id",
+        "task_id",
+        "expected_task_revision",
+        "mode",
+        "task_snapshot",
+        "inputs"
+      ],
+      "additionalProperties": false
+    },
+    "aftercare-resumeResult": {
+      "type": "object",
+      "properties": {
+        "contract_version": {
+          "const": "1.0.0"
+        },
+        "skill_id": {
+          "const": "aftercare-resume"
+        },
+        "call_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "task_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "based_on_task_revision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "completed",
+            "needs_user",
+            "needs_observation",
+            "blocked",
+            "failed"
+          ]
+        },
+        "data": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ResumePlan"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "questions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Question"
+          }
+        },
+        "issues": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Issue"
+          }
+        },
+        "user_message": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "contract_version",
+        "skill_id",
+        "call_id",
+        "task_id",
+        "based_on_task_revision",
+        "status",
+        "data",
+        "questions",
+        "issues",
+        "user_message"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "completed"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "data": {
+                "$ref": "#/$defs/ResumePlan"
+              },
+              "questions": {
+                "maxItems": 0
+              },
+              "issues": {
+                "maxItems": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "needs_user"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "questions": {
+                "minItems": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": [
+                  "needs_observation",
+                  "blocked",
+                  "failed"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "issues": {
+                "minItems": 1
+              }
+            }
+          }
+        }
+      ]
+    },
+    "aftercare-logisticsRequest": {
+      "type": "object",
+      "properties": {
+        "contract_version": {
+          "const": "1.0.0"
+        },
+        "skill_id": {
+          "const": "aftercare-logistics"
+        },
+        "skill_version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "call_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "task_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "expected_task_revision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "self",
+            "guided",
+            "auto"
+          ]
+        },
+        "task_snapshot": {
+          "type": "object",
+          "properties": {
+            "artifact_id": {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+            },
+            "kind": {
+              "const": "TaskSnapshot"
+            },
+            "revision": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "artifact_id",
+            "kind",
+            "revision"
+          ],
+          "additionalProperties": false
+        },
+        "inputs": {
+          "type": "object",
+          "properties": {
+            "order": {
+              "type": "object",
+              "properties": {
+                "artifact_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "kind": {
+                  "const": "OrderSelection"
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "artifact_id",
+                "kind",
+                "revision"
+              ],
+              "additionalProperties": false
+            },
+            "remedy": {
+              "type": "object",
+              "properties": {
+                "artifact_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "kind": {
+                  "const": "RemedyPlan"
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "artifact_id",
+                "kind",
+                "revision"
+              ],
+              "additionalProperties": false
+            },
+            "outcome": {
+              "type": "object",
+              "properties": {
+                "artifact_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "kind": {
+                  "const": "OutcomeReport"
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "artifact_id",
+                "kind",
+                "revision"
+              ],
+              "additionalProperties": false
+            },
+            "platform_view": {
+              "type": "object",
+              "properties": {
+                "artifact_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "kind": {
+                  "const": "PlatformView"
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "artifact_id",
+                "kind",
+                "revision"
+              ],
+              "additionalProperties": false
+            },
+            "user_decision": {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "artifact_id": {
+                      "type": "string",
+                      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                    },
+                    "kind": {
+                      "const": "UserDecision"
+                    },
+                    "revision": {
+                      "type": "integer",
+                      "minimum": 0
+                    }
+                  },
+                  "required": [
+                    "artifact_id",
+                    "kind",
+                    "revision"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "order",
+            "remedy",
+            "outcome",
+            "platform_view",
+            "user_decision"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "contract_version",
+        "skill_id",
+        "skill_version",
+        "call_id",
+        "task_id",
+        "expected_task_revision",
+        "mode",
+        "task_snapshot",
+        "inputs"
+      ],
+      "additionalProperties": false
+    },
+    "aftercare-logisticsResult": {
+      "type": "object",
+      "properties": {
+        "contract_version": {
+          "const": "1.0.0"
+        },
+        "skill_id": {
+          "const": "aftercare-logistics"
+        },
+        "call_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "task_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "based_on_task_revision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "completed",
+            "needs_user",
+            "needs_observation",
+            "blocked",
+            "failed"
+          ]
+        },
+        "data": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/LogisticsPlan"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "questions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Question"
+          }
+        },
+        "issues": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Issue"
+          }
+        },
+        "user_message": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "contract_version",
+        "skill_id",
+        "call_id",
+        "task_id",
+        "based_on_task_revision",
+        "status",
+        "data",
+        "questions",
+        "issues",
+        "user_message"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "completed"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "data": {
+                "$ref": "#/$defs/LogisticsPlan"
+              },
+              "questions": {
+                "maxItems": 0
+              },
+              "issues": {
+                "maxItems": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "needs_user"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "questions": {
+                "minItems": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": [
+                  "needs_observation",
+                  "blocked",
+                  "failed"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "issues": {
+                "minItems": 1
+              }
+            }
+          }
+        }
+      ]
+    },
+    "aftercare-appealRequest": {
+      "type": "object",
+      "properties": {
+        "contract_version": {
+          "const": "1.0.0"
+        },
+        "skill_id": {
+          "const": "aftercare-appeal"
+        },
+        "skill_version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "call_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "task_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "expected_task_revision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "self",
+            "guided",
+            "auto"
+          ]
+        },
+        "task_snapshot": {
+          "type": "object",
+          "properties": {
+            "artifact_id": {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+            },
+            "kind": {
+              "const": "TaskSnapshot"
+            },
+            "revision": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "artifact_id",
+            "kind",
+            "revision"
+          ],
+          "additionalProperties": false
+        },
+        "inputs": {
+          "type": "object",
+          "properties": {
+            "outcome": {
+              "type": "object",
+              "properties": {
+                "artifact_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "kind": {
+                  "const": "OutcomeReport"
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "artifact_id",
+                "kind",
+                "revision"
+              ],
+              "additionalProperties": false
+            },
+            "platform_view": {
+              "type": "object",
+              "properties": {
+                "artifact_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "kind": {
+                  "const": "PlatformView"
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "artifact_id",
+                "kind",
+                "revision"
+              ],
+              "additionalProperties": false
+            },
+            "evidence": {
+              "type": "object",
+              "properties": {
+                "artifact_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "kind": {
+                  "const": "EvidenceBundle"
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "artifact_id",
+                "kind",
+                "revision"
+              ],
+              "additionalProperties": false
+            },
+            "ledger": {
+              "type": "object",
+              "properties": {
+                "artifact_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "kind": {
+                  "const": "OperationLedger"
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "artifact_id",
+                "kind",
+                "revision"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "outcome",
+            "platform_view",
+            "evidence",
+            "ledger"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "contract_version",
+        "skill_id",
+        "skill_version",
+        "call_id",
+        "task_id",
+        "expected_task_revision",
+        "mode",
+        "task_snapshot",
+        "inputs"
+      ],
+      "additionalProperties": false
+    },
+    "aftercare-appealResult": {
+      "type": "object",
+      "properties": {
+        "contract_version": {
+          "const": "1.0.0"
+        },
+        "skill_id": {
+          "const": "aftercare-appeal"
+        },
+        "call_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "task_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "based_on_task_revision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "completed",
+            "needs_user",
+            "needs_observation",
+            "blocked",
+            "failed"
+          ]
+        },
+        "data": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/AppealDraft"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "questions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Question"
+          }
+        },
+        "issues": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Issue"
+          }
+        },
+        "user_message": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "contract_version",
+        "skill_id",
+        "call_id",
+        "task_id",
+        "based_on_task_revision",
+        "status",
+        "data",
+        "questions",
+        "issues",
+        "user_message"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "completed"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "data": {
+                "$ref": "#/$defs/AppealDraft"
+              },
+              "questions": {
+                "maxItems": 0
+              },
+              "issues": {
+                "maxItems": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "needs_user"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "questions": {
+                "minItems": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": [
+                  "needs_observation",
+                  "blocked",
+                  "failed"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "issues": {
+                "minItems": 1
+              }
+            }
+          }
+        }
+      ]
+    },
+    "aftercare-handoffRequest": {
+      "type": "object",
+      "properties": {
+        "contract_version": {
+          "const": "1.0.0"
+        },
+        "skill_id": {
+          "const": "aftercare-handoff"
+        },
+        "skill_version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "call_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "task_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "expected_task_revision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "self",
+            "guided",
+            "auto"
+          ]
+        },
+        "task_snapshot": {
+          "type": "object",
+          "properties": {
+            "artifact_id": {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+            },
+            "kind": {
+              "const": "TaskSnapshot"
+            },
+            "revision": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "artifact_id",
+            "kind",
+            "revision"
+          ],
+          "additionalProperties": false
+        },
+        "inputs": {
+          "type": "object",
+          "properties": {
+            "outcome": {
+              "type": "object",
+              "properties": {
+                "artifact_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "kind": {
+                  "const": "OutcomeReport"
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "artifact_id",
+                "kind",
+                "revision"
+              ],
+              "additionalProperties": false
+            },
+            "ledger": {
+              "type": "object",
+              "properties": {
+                "artifact_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "kind": {
+                  "const": "OperationLedger"
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "artifact_id",
+                "kind",
+                "revision"
+              ],
+              "additionalProperties": false
+            },
+            "platform_view": {
+              "type": "object",
+              "properties": {
+                "artifact_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "kind": {
+                  "const": "PlatformView"
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "artifact_id",
+                "kind",
+                "revision"
+              ],
+              "additionalProperties": false
+            },
+            "evidence": {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "artifact_id": {
+                      "type": "string",
+                      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                    },
+                    "kind": {
+                      "const": "EvidenceBundle"
+                    },
+                    "revision": {
+                      "type": "integer",
+                      "minimum": 0
+                    }
+                  },
+                  "required": [
+                    "artifact_id",
+                    "kind",
+                    "revision"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "outcome",
+            "ledger",
+            "platform_view",
+            "evidence"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "contract_version",
+        "skill_id",
+        "skill_version",
+        "call_id",
+        "task_id",
+        "expected_task_revision",
+        "mode",
+        "task_snapshot",
+        "inputs"
+      ],
+      "additionalProperties": false
+    },
+    "aftercare-handoffResult": {
+      "type": "object",
+      "properties": {
+        "contract_version": {
+          "const": "1.0.0"
+        },
+        "skill_id": {
+          "const": "aftercare-handoff"
+        },
+        "call_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "task_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "based_on_task_revision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "completed",
+            "needs_user",
+            "needs_observation",
+            "blocked",
+            "failed"
+          ]
+        },
+        "data": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/HandoffDraft"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "questions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Question"
+          }
+        },
+        "issues": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Issue"
+          }
+        },
+        "user_message": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "contract_version",
+        "skill_id",
+        "call_id",
+        "task_id",
+        "based_on_task_revision",
+        "status",
+        "data",
+        "questions",
+        "issues",
+        "user_message"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "completed"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "data": {
+                "$ref": "#/$defs/HandoffDraft"
+              },
+              "questions": {
+                "maxItems": 0
+              },
+              "issues": {
+                "maxItems": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "needs_user"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "questions": {
+                "minItems": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": [
+                  "needs_observation",
+                  "blocked",
+                  "failed"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "issues": {
+                "minItems": 1
+              }
+            }
+          }
+        }
+      ]
+    },
+    "platform-mainRequest": {
+      "type": "object",
+      "properties": {
+        "contract_version": {
+          "const": "1.0.0"
+        },
+        "skill_id": {
+          "const": "platform-main"
+        },
+        "skill_version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "call_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "task_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "expected_task_revision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "self",
+            "guided",
+            "auto"
+          ]
+        },
+        "task_snapshot": {
+          "type": "object",
+          "properties": {
+            "artifact_id": {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+            },
+            "kind": {
+              "const": "TaskSnapshot"
+            },
+            "revision": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "artifact_id",
+            "kind",
+            "revision"
+          ],
+          "additionalProperties": false
+        },
+        "inputs": {
+          "type": "object",
+          "properties": {
+            "observations": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "artifact_id": {
+                    "type": "string",
+                    "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                  },
+                  "kind": {
+                    "const": "Observation"
+                  },
+                  "revision": {
+                    "type": "integer",
+                    "minimum": 0
+                  }
+                },
+                "required": [
+                  "artifact_id",
+                  "kind",
+                  "revision"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1
+            },
+            "operation_intent": {
+              "type": "string",
+              "minLength": 1
+            },
+            "environment": {
+              "const": "real"
+            }
+          },
+          "required": [
+            "observations",
+            "operation_intent",
+            "environment"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "contract_version",
+        "skill_id",
+        "skill_version",
+        "call_id",
+        "task_id",
+        "expected_task_revision",
+        "mode",
+        "task_snapshot",
+        "inputs"
+      ],
+      "additionalProperties": false
+    },
+    "platform-mainResult": {
+      "type": "object",
+      "properties": {
+        "contract_version": {
+          "const": "1.0.0"
+        },
+        "skill_id": {
+          "const": "platform-main"
+        },
+        "call_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "task_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "based_on_task_revision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "completed",
+            "needs_user",
+            "needs_observation",
+            "blocked",
+            "failed"
+          ]
+        },
+        "data": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PlatformView"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "questions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Question"
+          }
+        },
+        "issues": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Issue"
+          }
+        },
+        "user_message": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "contract_version",
+        "skill_id",
+        "call_id",
+        "task_id",
+        "based_on_task_revision",
+        "status",
+        "data",
+        "questions",
+        "issues",
+        "user_message"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "completed"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "data": {
+                "$ref": "#/$defs/PlatformView"
+              },
+              "questions": {
+                "maxItems": 0
+              },
+              "issues": {
+                "maxItems": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "needs_user"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "questions": {
+                "minItems": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": [
+                  "needs_observation",
+                  "blocked",
+                  "failed"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "issues": {
+                "minItems": 1
+              }
+            }
+          }
+        }
+      ]
+    },
+    "platform-secondaryRequest": {
+      "type": "object",
+      "properties": {
+        "contract_version": {
+          "const": "1.0.0"
+        },
+        "skill_id": {
+          "const": "platform-secondary"
+        },
+        "skill_version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "call_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "task_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "expected_task_revision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "self",
+            "guided",
+            "auto"
+          ]
+        },
+        "task_snapshot": {
+          "type": "object",
+          "properties": {
+            "artifact_id": {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+            },
+            "kind": {
+              "const": "TaskSnapshot"
+            },
+            "revision": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "artifact_id",
+            "kind",
+            "revision"
+          ],
+          "additionalProperties": false
+        },
+        "inputs": {
+          "type": "object",
+          "properties": {
+            "observations": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "artifact_id": {
+                    "type": "string",
+                    "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                  },
+                  "kind": {
+                    "const": "Observation"
+                  },
+                  "revision": {
+                    "type": "integer",
+                    "minimum": 0
+                  }
+                },
+                "required": [
+                  "artifact_id",
+                  "kind",
+                  "revision"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1
+            },
+            "operation_intent": {
+              "type": "string",
+              "minLength": 1
+            },
+            "environment": {
+              "const": "real"
+            }
+          },
+          "required": [
+            "observations",
+            "operation_intent",
+            "environment"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "contract_version",
+        "skill_id",
+        "skill_version",
+        "call_id",
+        "task_id",
+        "expected_task_revision",
+        "mode",
+        "task_snapshot",
+        "inputs"
+      ],
+      "additionalProperties": false
+    },
+    "platform-secondaryResult": {
+      "type": "object",
+      "properties": {
+        "contract_version": {
+          "const": "1.0.0"
+        },
+        "skill_id": {
+          "const": "platform-secondary"
+        },
+        "call_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "task_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "based_on_task_revision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "completed",
+            "needs_user",
+            "needs_observation",
+            "blocked",
+            "failed"
+          ]
+        },
+        "data": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PlatformView"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "questions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Question"
+          }
+        },
+        "issues": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Issue"
+          }
+        },
+        "user_message": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "contract_version",
+        "skill_id",
+        "call_id",
+        "task_id",
+        "based_on_task_revision",
+        "status",
+        "data",
+        "questions",
+        "issues",
+        "user_message"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "completed"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "data": {
+                "$ref": "#/$defs/PlatformView"
+              },
+              "questions": {
+                "maxItems": 0
+              },
+              "issues": {
+                "maxItems": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "needs_user"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "questions": {
+                "minItems": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": [
+                  "needs_observation",
+                  "blocked",
+                  "failed"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "issues": {
+                "minItems": 1
+              }
+            }
+          }
+        }
+      ]
+    },
+    "platform-sandboxRequest": {
+      "type": "object",
+      "properties": {
+        "contract_version": {
+          "const": "1.0.0"
+        },
+        "skill_id": {
+          "const": "platform-sandbox"
+        },
+        "skill_version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "call_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "task_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "expected_task_revision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "self",
+            "guided",
+            "auto"
+          ]
+        },
+        "task_snapshot": {
+          "type": "object",
+          "properties": {
+            "artifact_id": {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+            },
+            "kind": {
+              "const": "TaskSnapshot"
+            },
+            "revision": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "artifact_id",
+            "kind",
+            "revision"
+          ],
+          "additionalProperties": false
+        },
+        "inputs": {
+          "type": "object",
+          "properties": {
+            "observations": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "artifact_id": {
+                    "type": "string",
+                    "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                  },
+                  "kind": {
+                    "const": "Observation"
+                  },
+                  "revision": {
+                    "type": "integer",
+                    "minimum": 0
+                  }
+                },
+                "required": [
+                  "artifact_id",
+                  "kind",
+                  "revision"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1
+            },
+            "operation_intent": {
+              "type": "string",
+              "minLength": 1
+            },
+            "environment": {
+              "const": "sandbox"
+            }
+          },
+          "required": [
+            "observations",
+            "operation_intent",
+            "environment"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "contract_version",
+        "skill_id",
+        "skill_version",
+        "call_id",
+        "task_id",
+        "expected_task_revision",
+        "mode",
+        "task_snapshot",
+        "inputs"
+      ],
+      "additionalProperties": false
+    },
+    "platform-sandboxResult": {
+      "type": "object",
+      "properties": {
+        "contract_version": {
+          "const": "1.0.0"
+        },
+        "skill_id": {
+          "const": "platform-sandbox"
+        },
+        "call_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "task_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+        },
+        "based_on_task_revision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "completed",
+            "needs_user",
+            "needs_observation",
+            "blocked",
+            "failed"
+          ]
+        },
+        "data": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PlatformView"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "questions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Question"
+          }
+        },
+        "issues": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Issue"
+          }
+        },
+        "user_message": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "contract_version",
+        "skill_id",
+        "call_id",
+        "task_id",
+        "based_on_task_revision",
+        "status",
+        "data",
+        "questions",
+        "issues",
+        "user_message"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "completed"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "data": {
+                "$ref": "#/$defs/PlatformView"
+              },
+              "questions": {
+                "maxItems": 0
+              },
+              "issues": {
+                "maxItems": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "needs_user"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "questions": {
+                "minItems": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": [
+                  "needs_observation",
+                  "blocked",
+                  "failed"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "issues": {
+                "minItems": 1
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  "oneOf": [
+    {
+      "type": "object",
+      "properties": {
+        "message_type": {
+          "const": "request"
+        },
+        "body": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/aftercare-intakeRequest"
+            },
+            {
+              "$ref": "#/$defs/aftercare-orderRequest"
+            },
+            {
+              "$ref": "#/$defs/aftercare-remedyRequest"
+            },
+            {
+              "$ref": "#/$defs/aftercare-evidenceRequest"
+            },
+            {
+              "$ref": "#/$defs/aftercare-interactRequest"
+            },
+            {
+              "$ref": "#/$defs/aftercare-verifyRequest"
+            },
+            {
+              "$ref": "#/$defs/aftercare-recoverRequest"
+            },
+            {
+              "$ref": "#/$defs/aftercare-resumeRequest"
+            },
+            {
+              "$ref": "#/$defs/aftercare-logisticsRequest"
+            },
+            {
+              "$ref": "#/$defs/aftercare-appealRequest"
+            },
+            {
+              "$ref": "#/$defs/aftercare-handoffRequest"
+            },
+            {
+              "$ref": "#/$defs/platform-mainRequest"
+            },
+            {
+              "$ref": "#/$defs/platform-secondaryRequest"
+            },
+            {
+              "$ref": "#/$defs/platform-sandboxRequest"
+            }
+          ]
+        }
+      },
+      "required": [
+        "message_type",
+        "body"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "message_type": {
+          "const": "result"
+        },
+        "body": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/aftercare-intakeResult"
+            },
+            {
+              "$ref": "#/$defs/aftercare-orderResult"
+            },
+            {
+              "$ref": "#/$defs/aftercare-remedyResult"
+            },
+            {
+              "$ref": "#/$defs/aftercare-evidenceResult"
+            },
+            {
+              "$ref": "#/$defs/aftercare-interactResult"
+            },
+            {
+              "$ref": "#/$defs/aftercare-verifyResult"
+            },
+            {
+              "$ref": "#/$defs/aftercare-recoverResult"
+            },
+            {
+              "$ref": "#/$defs/aftercare-resumeResult"
+            },
+            {
+              "$ref": "#/$defs/aftercare-logisticsResult"
+            },
+            {
+              "$ref": "#/$defs/aftercare-appealResult"
+            },
+            {
+              "$ref": "#/$defs/aftercare-handoffResult"
+            },
+            {
+              "$ref": "#/$defs/platform-mainResult"
+            },
+            {
+              "$ref": "#/$defs/platform-secondaryResult"
+            },
+            {
+              "$ref": "#/$defs/platform-sandboxResult"
+            }
+          ]
+        }
+      },
+      "required": [
+        "message_type",
+        "body"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "message_type": {
+          "const": "artifact"
+        },
+        "body": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "artifact_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "kind": {
+                  "const": "AppealDraft"
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "task_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "producer_call_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "created_at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "trust": {
+                  "const": "untrusted_skill_output"
+                },
+                "data": {
+                  "$ref": "#/$defs/AppealDraft"
+                }
+              },
+              "required": [
+                "artifact_id",
+                "kind",
+                "revision",
+                "task_id",
+                "producer_call_id",
+                "created_at",
+                "trust",
+                "data"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "artifact_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "kind": {
+                  "const": "EvidenceBundle"
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "task_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "producer_call_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "created_at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "trust": {
+                  "const": "untrusted_skill_output"
+                },
+                "data": {
+                  "$ref": "#/$defs/EvidenceBundle"
+                }
+              },
+              "required": [
+                "artifact_id",
+                "kind",
+                "revision",
+                "task_id",
+                "producer_call_id",
+                "created_at",
+                "trust",
+                "data"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "artifact_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "kind": {
+                  "const": "ExecutionReceipt"
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "task_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "producer_call_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "created_at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "trust": {
+                  "const": "runtime_record"
+                },
+                "data": {
+                  "$ref": "#/$defs/ExecutionReceipt"
+                }
+              },
+              "required": [
+                "artifact_id",
+                "kind",
+                "revision",
+                "task_id",
+                "producer_call_id",
+                "created_at",
+                "trust",
+                "data"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "artifact_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "kind": {
+                  "const": "FailureEvent"
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "task_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "producer_call_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "created_at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "trust": {
+                  "const": "runtime_record"
+                },
+                "data": {
+                  "$ref": "#/$defs/FailureEvent"
+                }
+              },
+              "required": [
+                "artifact_id",
+                "kind",
+                "revision",
+                "task_id",
+                "producer_call_id",
+                "created_at",
+                "trust",
+                "data"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "artifact_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "kind": {
+                  "const": "HandoffDraft"
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "task_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "producer_call_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "created_at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "trust": {
+                  "const": "untrusted_skill_output"
+                },
+                "data": {
+                  "$ref": "#/$defs/HandoffDraft"
+                }
+              },
+              "required": [
+                "artifact_id",
+                "kind",
+                "revision",
+                "task_id",
+                "producer_call_id",
+                "created_at",
+                "trust",
+                "data"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "artifact_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "kind": {
+                  "const": "InteractionPlan"
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "task_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "producer_call_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "created_at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "trust": {
+                  "const": "untrusted_skill_output"
+                },
+                "data": {
+                  "$ref": "#/$defs/InteractionPlan"
+                }
+              },
+              "required": [
+                "artifact_id",
+                "kind",
+                "revision",
+                "task_id",
+                "producer_call_id",
+                "created_at",
+                "trust",
+                "data"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "artifact_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "kind": {
+                  "const": "LogisticsPlan"
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "task_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "producer_call_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "created_at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "trust": {
+                  "const": "untrusted_skill_output"
+                },
+                "data": {
+                  "$ref": "#/$defs/LogisticsPlan"
+                }
+              },
+              "required": [
+                "artifact_id",
+                "kind",
+                "revision",
+                "task_id",
+                "producer_call_id",
+                "created_at",
+                "trust",
+                "data"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "artifact_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "kind": {
+                  "const": "Observation"
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "task_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "producer_call_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "created_at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "trust": {
+                  "const": "runtime_record"
+                },
+                "data": {
+                  "$ref": "#/$defs/Observation"
+                }
+              },
+              "required": [
+                "artifact_id",
+                "kind",
+                "revision",
+                "task_id",
+                "producer_call_id",
+                "created_at",
+                "trust",
+                "data"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "artifact_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "kind": {
+                  "const": "OperationLedger"
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "task_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "producer_call_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "created_at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "trust": {
+                  "const": "runtime_record"
+                },
+                "data": {
+                  "$ref": "#/$defs/OperationLedger"
+                }
+              },
+              "required": [
+                "artifact_id",
+                "kind",
+                "revision",
+                "task_id",
+                "producer_call_id",
+                "created_at",
+                "trust",
+                "data"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "artifact_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "kind": {
+                  "const": "OrderSelection"
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "task_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "producer_call_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "created_at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "trust": {
+                  "const": "untrusted_skill_output"
+                },
+                "data": {
+                  "$ref": "#/$defs/OrderSelection"
+                }
+              },
+              "required": [
+                "artifact_id",
+                "kind",
+                "revision",
+                "task_id",
+                "producer_call_id",
+                "created_at",
+                "trust",
+                "data"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "artifact_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "kind": {
+                  "const": "OutcomeReport"
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "task_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "producer_call_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "created_at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "trust": {
+                  "const": "untrusted_skill_output"
+                },
+                "data": {
+                  "$ref": "#/$defs/OutcomeReport"
+                }
+              },
+              "required": [
+                "artifact_id",
+                "kind",
+                "revision",
+                "task_id",
+                "producer_call_id",
+                "created_at",
+                "trust",
+                "data"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "artifact_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "kind": {
+                  "const": "PlatformView"
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "task_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "producer_call_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "created_at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "trust": {
+                  "const": "untrusted_skill_output"
+                },
+                "data": {
+                  "$ref": "#/$defs/PlatformView"
+                }
+              },
+              "required": [
+                "artifact_id",
+                "kind",
+                "revision",
+                "task_id",
+                "producer_call_id",
+                "created_at",
+                "trust",
+                "data"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "artifact_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "kind": {
+                  "const": "RecoveryPlan"
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "task_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "producer_call_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "created_at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "trust": {
+                  "const": "untrusted_skill_output"
+                },
+                "data": {
+                  "$ref": "#/$defs/RecoveryPlan"
+                }
+              },
+              "required": [
+                "artifact_id",
+                "kind",
+                "revision",
+                "task_id",
+                "producer_call_id",
+                "created_at",
+                "trust",
+                "data"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "artifact_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "kind": {
+                  "const": "RemedyPlan"
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "task_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "producer_call_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "created_at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "trust": {
+                  "const": "untrusted_skill_output"
+                },
+                "data": {
+                  "$ref": "#/$defs/RemedyPlan"
+                }
+              },
+              "required": [
+                "artifact_id",
+                "kind",
+                "revision",
+                "task_id",
+                "producer_call_id",
+                "created_at",
+                "trust",
+                "data"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "artifact_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "kind": {
+                  "const": "ResumePlan"
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "task_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "producer_call_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "created_at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "trust": {
+                  "const": "untrusted_skill_output"
+                },
+                "data": {
+                  "$ref": "#/$defs/ResumePlan"
+                }
+              },
+              "required": [
+                "artifact_id",
+                "kind",
+                "revision",
+                "task_id",
+                "producer_call_id",
+                "created_at",
+                "trust",
+                "data"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "artifact_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "kind": {
+                  "const": "TaskIntent"
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "task_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "producer_call_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "created_at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "trust": {
+                  "const": "untrusted_skill_output"
+                },
+                "data": {
+                  "$ref": "#/$defs/TaskIntent"
+                }
+              },
+              "required": [
+                "artifact_id",
+                "kind",
+                "revision",
+                "task_id",
+                "producer_call_id",
+                "created_at",
+                "trust",
+                "data"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "artifact_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "kind": {
+                  "const": "TaskSnapshot"
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "task_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "producer_call_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "created_at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "trust": {
+                  "const": "runtime_record"
+                },
+                "data": {
+                  "$ref": "#/$defs/TaskSnapshot"
+                }
+              },
+              "required": [
+                "artifact_id",
+                "kind",
+                "revision",
+                "task_id",
+                "producer_call_id",
+                "created_at",
+                "trust",
+                "data"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "artifact_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "kind": {
+                  "const": "UserDecision"
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "task_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "producer_call_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "created_at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "trust": {
+                  "const": "runtime_record"
+                },
+                "data": {
+                  "$ref": "#/$defs/UserDecision"
+                }
+              },
+              "required": [
+                "artifact_id",
+                "kind",
+                "revision",
+                "task_id",
+                "producer_call_id",
+                "created_at",
+                "trust",
+                "data"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "artifact_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "kind": {
+                  "const": "UserTurn"
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "task_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "producer_call_id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                },
+                "created_at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "trust": {
+                  "const": "runtime_record"
+                },
+                "data": {
+                  "$ref": "#/$defs/UserTurn"
+                }
+              },
+              "required": [
+                "artifact_id",
+                "kind",
+                "revision",
+                "task_id",
+                "producer_call_id",
+                "created_at",
+                "trust",
+                "data"
+              ],
+              "additionalProperties": false
+            }
+          ]
+        }
+      },
+      "required": [
+        "message_type",
+        "body"
+      ],
+      "additionalProperties": false
+    }
+  ]
+}

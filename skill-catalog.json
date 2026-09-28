@@ -1,0 +1,198 @@
+{
+  "version": "1.0.0",
+  "status": "design_not_implementation",
+  "total": 14,
+  "skills": [
+    {
+      "skill_id": "aftercare-intake",
+      "display_name": "诉求澄清",
+      "layer": "common",
+      "input_schema": "aftercare-intakeRequest",
+      "result_schema": "aftercare-intakeResult",
+      "output_kind": "TaskIntent",
+      "typical_next_skills": [
+        "aftercare-order",
+        "aftercare-remedy"
+      ],
+      "implemented": false
+    },
+    {
+      "skill_id": "aftercare-order",
+      "display_name": "订单定位与确认",
+      "layer": "common",
+      "input_schema": "aftercare-orderRequest",
+      "result_schema": "aftercare-orderResult",
+      "output_kind": "OrderSelection",
+      "typical_next_skills": [
+        "aftercare-interact",
+        "aftercare-remedy"
+      ],
+      "implemented": false
+    },
+    {
+      "skill_id": "aftercare-remedy",
+      "display_name": "方案与要求核对",
+      "layer": "common",
+      "input_schema": "aftercare-remedyRequest",
+      "result_schema": "aftercare-remedyResult",
+      "output_kind": "RemedyPlan",
+      "typical_next_skills": [
+        "aftercare-evidence",
+        "aftercare-interact"
+      ],
+      "implemented": false
+    },
+    {
+      "skill_id": "aftercare-evidence",
+      "display_name": "凭证整理与补充指导",
+      "layer": "common",
+      "input_schema": "aftercare-evidenceRequest",
+      "result_schema": "aftercare-evidenceResult",
+      "output_kind": "EvidenceBundle",
+      "typical_next_skills": [
+        "aftercare-interact"
+      ],
+      "implemented": false
+    },
+    {
+      "skill_id": "aftercare-interact",
+      "display_name": "页面推进与陪同",
+      "layer": "common",
+      "input_schema": "aftercare-interactRequest",
+      "result_schema": "aftercare-interactResult",
+      "output_kind": "InteractionPlan",
+      "typical_next_skills": [
+        "aftercare-verify",
+        "aftercare-recover"
+      ],
+      "implemented": false
+    },
+    {
+      "skill_id": "aftercare-verify",
+      "display_name": "状态与结果核对",
+      "layer": "common",
+      "input_schema": "aftercare-verifyRequest",
+      "result_schema": "aftercare-verifyResult",
+      "output_kind": "OutcomeReport",
+      "typical_next_skills": [
+        "aftercare-logistics",
+        "aftercare-evidence",
+        "aftercare-appeal",
+        "aftercare-recover"
+      ],
+      "implemented": false
+    },
+    {
+      "skill_id": "aftercare-recover",
+      "display_name": "页面变化与失败恢复",
+      "layer": "common",
+      "input_schema": "aftercare-recoverRequest",
+      "result_schema": "aftercare-recoverResult",
+      "output_kind": "RecoveryPlan",
+      "typical_next_skills": [
+        "aftercare-interact",
+        "aftercare-verify",
+        "aftercare-handoff"
+      ],
+      "implemented": false
+    },
+    {
+      "skill_id": "aftercare-resume",
+      "display_name": "跨会话恢复",
+      "layer": "common",
+      "input_schema": "aftercare-resumeRequest",
+      "result_schema": "aftercare-resumeResult",
+      "output_kind": "ResumePlan",
+      "typical_next_skills": [
+        "aftercare-order",
+        "aftercare-remedy",
+        "aftercare-interact"
+      ],
+      "implemented": false
+    },
+    {
+      "skill_id": "aftercare-logistics",
+      "display_name": "退货与平台内取件",
+      "layer": "common",
+      "input_schema": "aftercare-logisticsRequest",
+      "result_schema": "aftercare-logisticsResult",
+      "output_kind": "LogisticsPlan",
+      "typical_next_skills": [
+        "aftercare-interact",
+        "aftercare-verify"
+      ],
+      "implemented": false
+    },
+    {
+      "skill_id": "aftercare-appeal",
+      "display_name": "平台内复核与申诉",
+      "layer": "common",
+      "input_schema": "aftercare-appealRequest",
+      "result_schema": "aftercare-appealResult",
+      "output_kind": "AppealDraft",
+      "typical_next_skills": [
+        "aftercare-evidence",
+        "aftercare-interact",
+        "aftercare-handoff"
+      ],
+      "implemented": false
+    },
+    {
+      "skill_id": "aftercare-handoff",
+      "display_name": "官方客服交接",
+      "layer": "common",
+      "input_schema": "aftercare-handoffRequest",
+      "result_schema": "aftercare-handoffResult",
+      "output_kind": "HandoffDraft",
+      "typical_next_skills": [
+        "aftercare-interact"
+      ],
+      "implemented": false
+    },
+    {
+      "skill_id": "platform-main",
+      "display_name": "主平台适配",
+      "layer": "platform",
+      "input_schema": "platform-mainRequest",
+      "result_schema": "platform-mainResult",
+      "output_kind": "PlatformView",
+      "typical_next_skills": [
+        "aftercare-order",
+        "aftercare-remedy",
+        "aftercare-interact",
+        "aftercare-verify"
+      ],
+      "implemented": false
+    },
+    {
+      "skill_id": "platform-secondary",
+      "display_name": "次平台适配",
+      "layer": "platform",
+      "input_schema": "platform-secondaryRequest",
+      "result_schema": "platform-secondaryResult",
+      "output_kind": "PlatformView",
+      "typical_next_skills": [
+        "aftercare-order",
+        "aftercare-remedy",
+        "aftercare-interact",
+        "aftercare-verify"
+      ],
+      "implemented": false
+    },
+    {
+      "skill_id": "platform-sandbox",
+      "display_name": "测试商城适配",
+      "layer": "platform",
+      "input_schema": "platform-sandboxRequest",
+      "result_schema": "platform-sandboxResult",
+      "output_kind": "PlatformView",
+      "typical_next_skills": [
+        "aftercare-order",
+        "aftercare-remedy",
+        "aftercare-interact",
+        "aftercare-verify"
+      ],
+      "implemented": false
+    }
+  ]
+}
