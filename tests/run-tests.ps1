@@ -19,6 +19,11 @@ try {
 
   Write-Host "`n=== end-to-end HTTP tests (stub model) ===" -ForegroundColor Cyan
   & $python -B -X utf8 "tests\_e2e_http.py"
+  if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+  # Needs the documented default port 8766 to be free.
+  Write-Host "`n=== README startup smoke test ===" -ForegroundColor Cyan
+  & $python -B -X utf8 "tests\_smoke_readme.py"
   exit $LASTEXITCODE
 } finally {
   Pop-Location
