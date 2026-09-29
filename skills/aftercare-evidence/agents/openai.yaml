@@ -1,0 +1,4 @@
+interface:
+  display_name: "售后凭证整理"
+  short_description: "核对真实售后材料、指导补拍并整理事实说明，保留原件和用户核对边界"
+  default_prompt: "使用 $aftercare-evidence 核对当前售后方案所需的真实材料并指导补充。"

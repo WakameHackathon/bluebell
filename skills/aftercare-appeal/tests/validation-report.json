@@ -1,0 +1,13 @@
+{
+  "schema_structure": {"status":"passed for synthetic request/result using package dependency-free subset validator; full Draft 2020-12 engine not installed"},
+  "grounds_evidence_linkage": {"status":"passed for structural refs and registered-ref lint; evidence truth/meaning not tested"},
+  "draft_fact_consistency": {"status":"manual review required"},
+  "user_review_vs_send_authorization": {"status":"host not implemented; skill rules only"},
+  "duplicate_appeal_protection": {"status":"host not implemented; fixture lint only"},
+  "upstream_downstream_integration": {"status":"not integrated; no runtime present"},
+  "synthetic_cases": {"count":26,"expected_dispositions_recorded":true,"live_model_behavior_executed":false},
+  "deterministic_unit_tests": {"passed":26,"failed":0},
+  "package_schema_samples": {"request_valid":true,"result_valid":true},
+  "skill_creator_quick_validate": {"status":"not run successfully","reason":"bundled Python runtime lacks PyYAML dependency; did not install dependencies"},
+  "live_appeal_submissions": 0
+}

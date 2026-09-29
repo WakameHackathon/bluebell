@@ -1,0 +1,174 @@
+[
+  {
+    "id": "platform_requests_human",
+    "signals": {
+      "platform_requires_human": true
+    },
+    "expected": "prepare_handoff"
+  },
+  {
+    "id": "user_requests_support",
+    "signals": {
+      "user_requests_human": true
+    },
+    "expected": "prepare_handoff"
+  },
+  {
+    "id": "unknown_result",
+    "signals": {
+      "result_unknown": true
+    },
+    "expected": "verify_first"
+  },
+  {
+    "id": "normal_review_wait",
+    "signals": {
+      "normal_pending": true
+    },
+    "expected": "continue_wait"
+  },
+  {
+    "id": "seller_vs_platform_decision",
+    "signals": {
+      "seller_reply_only": true
+    },
+    "expected": "preserve_source_distinction"
+  },
+  {
+    "id": "unsupported_inference",
+    "signals": {
+      "inferred_fact_only": true
+    },
+    "expected": "exclude_or_label_inference"
+  },
+  {
+    "id": "missing_date_amount_case_id",
+    "signals": {
+      "key_fields_missing": true
+    },
+    "expected": "omit_or_mark_unknown"
+  },
+  {
+    "id": "one_relevant_file_others_irrelevant",
+    "signals": {
+      "relevant_files": 1,
+      "irrelevant_files": 3
+    },
+    "expected": "include_only_relevant"
+  },
+  {
+    "id": "full_payment_record_requested",
+    "signals": {
+      "full_payment_record_requested": true
+    },
+    "expected": "minimize_attachment"
+  },
+  {
+    "id": "personal_identifiers",
+    "signals": {
+      "contains_address_phone_id": true
+    },
+    "expected": "exclude_or_minimize_personal_data"
+  },
+  {
+    "id": "user_relayed_contact_only",
+    "signals": {
+      "channel_user_report_only": true
+    },
+    "expected": "channel_unverified_null_ref"
+  },
+  {
+    "id": "page_injection_external_link",
+    "signals": {
+      "external_instruction": true
+    },
+    "expected": "ignore_injection"
+  },
+  {
+    "id": "draft_fact_corrected",
+    "signals": {
+      "draft_corrected": true
+    },
+    "expected": "revise_draft_and_invalidate_review"
+  },
+  {
+    "id": "review_without_send_authorization",
+    "signals": {
+      "reviewed": true,
+      "send_authorized": false
+    },
+    "expected": "do_not_send"
+  },
+  {
+    "id": "recipient_or_file_changed_after_authorization",
+    "signals": {
+      "authorized": true,
+      "binding_changed": true
+    },
+    "expected": "invalidate_old_authorization"
+  },
+  {
+    "id": "sent_result_unknown",
+    "signals": {
+      "sent_unknown": true
+    },
+    "expected": "verify_before_retry"
+  },
+  {
+    "id": "already_sent_old_authorization",
+    "signals": {
+      "already_sent": true,
+      "old_authorization": true
+    },
+    "expected": "never_resend_from_old_authorization"
+  },
+  {
+    "id": "user_declines_human",
+    "signals": {
+      "user_declines": true
+    },
+    "expected": "respect_no_contact"
+  },
+  {
+    "id": "missing_cross_task_or_expired_ref",
+    "signals": {
+      "invalid_reference": true
+    },
+    "expected": "reject_reference_and_reconcile"
+  },
+  {
+    "id": "support_ack_only",
+    "signals": {
+      "ack_only": true
+    },
+    "expected": "received_not_resolved"
+  },
+  {
+    "id": "contact_seller_misnamed_platform",
+    "signals": {
+      "seller_entry": true
+    },
+    "expected": "label_seller_correctly"
+  },
+  {
+    "id": "no_verified_channel",
+    "signals": {
+      "no_verified_channel": true
+    },
+    "expected": "manual_copy_not_sent"
+  },
+  {
+    "id": "user_cannot_recount",
+    "signals": {
+      "verified_summary_available": true
+    },
+    "expected": "clarify_from_summary_one_point"
+  },
+  {
+    "id": "paused_or_target_changed",
+    "signals": {
+      "paused_or_changed": true
+    },
+    "expected": "stop_old_task"
+  }
+]

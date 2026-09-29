@@ -1,198 +1,501 @@
 {
-  "version": "1.0.0",
-  "status": "design_not_implementation",
+  "version": "1.1.0",
+  "contract_version": "1.0.0",
+  "status": "packages_vendored_under_skills",
   "total": 14,
+  "notes": [
+    "每个 implemented=true 的条目对应 skills/<package>/ 下的一个真实 Skill 包（由上游 aftercare-* 仓库的可加载 zip 原样解压）。",
+    "input_schema / result_schema 指向 tasks 中央契约 contracts.schema.json 的 $defs；schema 指向包内自带的契约摘录，仅供离线校核。",
+    "required_inputs 说明运行时如何把宿主数据装配成该 Skill 的 inputs：kind=artifact 走已登记产物引用，kind=ledger 由宿主构造，kind=inline/file 走调用参数。任何未登记的引用都会被拒绝，不伪造产物。",
+    "layer=platform 的三项在上游从未交付（GitHub 上不存在对应仓库），故 implemented=false；platform-sandbox 仅由宿主以沙箱适配器形式临时顶替，见 skill_runtime.sandbox_platform_view。"
+  ],
   "skills": [
     {
       "skill_id": "aftercare-intake",
       "display_name": "诉求澄清",
       "layer": "common",
+      "skill_version": "1.2.0",
+      "package": "skills/aftercare-intake",
+      "schema": "references/intake.schema.json",
       "input_schema": "aftercare-intakeRequest",
       "result_schema": "aftercare-intakeResult",
       "output_kind": "TaskIntent",
+      "required_inputs": {
+        "user_turn": {
+          "kind": "inline",
+          "description": "本轮用户输入事件，由宿主按 UserTurn 结构就地构造"
+        }
+      },
       "typical_next_skills": [
         "aftercare-order",
         "aftercare-remedy"
       ],
-      "implemented": false
+      "implemented": true
     },
     {
       "skill_id": "aftercare-order",
       "display_name": "订单定位与确认",
       "layer": "common",
+      "skill_version": "1.0.0",
+      "package": "skills/aftercare-order",
+      "schema": "references/order.schema.json",
       "input_schema": "aftercare-orderRequest",
       "result_schema": "aftercare-orderResult",
       "output_kind": "OrderSelection",
+      "required_inputs": {
+        "intent": {
+          "kind": "artifact",
+          "accepts": [
+            "TaskIntent"
+          ]
+        },
+        "platform_view": {
+          "kind": "artifact",
+          "accepts": [
+            "PlatformView"
+          ],
+          "autobuild": "platform_view_from_page_text"
+        },
+        "user_decision": {
+          "kind": "artifact",
+          "accepts": [
+            "UserDecision"
+          ],
+          "optional": true
+        }
+      },
       "typical_next_skills": [
         "aftercare-interact",
         "aftercare-remedy"
       ],
-      "implemented": false
+      "implemented": true
     },
     {
       "skill_id": "aftercare-remedy",
       "display_name": "方案与要求核对",
       "layer": "common",
+      "skill_version": "1.0.0",
+      "package": "skills/aftercare-remedy",
+      "schema": "references/remedy.schema.json",
       "input_schema": "aftercare-remedyRequest",
       "result_schema": "aftercare-remedyResult",
       "output_kind": "RemedyPlan",
+      "required_inputs": {
+        "intent": {
+          "kind": "artifact",
+          "accepts": [
+            "TaskIntent"
+          ]
+        },
+        "order": {
+          "kind": "artifact",
+          "accepts": [
+            "OrderSelection"
+          ]
+        },
+        "platform_view": {
+          "kind": "artifact",
+          "accepts": [
+            "PlatformView"
+          ],
+          "autobuild": "platform_view_from_page_text"
+        },
+        "user_decision": {
+          "kind": "artifact",
+          "accepts": [
+            "UserDecision"
+          ],
+          "optional": true
+        }
+      },
       "typical_next_skills": [
         "aftercare-evidence",
         "aftercare-interact"
       ],
-      "implemented": false
+      "implemented": true
     },
     {
       "skill_id": "aftercare-evidence",
       "display_name": "凭证整理与补充指导",
       "layer": "common",
+      "skill_version": "1.0.0",
+      "package": "skills/aftercare-evidence",
+      "schema": "references/evidence.schema.json",
       "input_schema": "aftercare-evidenceRequest",
       "result_schema": "aftercare-evidenceResult",
       "output_kind": "EvidenceBundle",
+      "required_inputs": {
+        "remedy": {
+          "kind": "artifact",
+          "accepts": [
+            "RemedyPlan"
+          ]
+        },
+        "platform_view": {
+          "kind": "artifact",
+          "accepts": [
+            "PlatformView"
+          ],
+          "autobuild": "platform_view_from_page_text"
+        },
+        "approved_file_refs": {
+          "kind": "file",
+          "description": "宿主已核准登记的文件引用 ID 列表，不是文件内容，也不是上传授权"
+        },
+        "user_turn": {
+          "kind": "inline",
+          "optional": true
+        }
+      },
       "typical_next_skills": [
         "aftercare-interact"
       ],
-      "implemented": false
+      "implemented": true
     },
     {
       "skill_id": "aftercare-interact",
       "display_name": "页面推进与陪同",
       "layer": "common",
+      "skill_version": "1.0.0",
+      "package": "skills/aftercare-interact",
+      "schema": "references/interact.schema.json",
       "input_schema": "aftercare-interactRequest",
       "result_schema": "aftercare-interactResult",
       "output_kind": "InteractionPlan",
+      "required_inputs": {
+        "goal_step": {
+          "kind": "inline",
+          "description": "本步意图，按 Step 结构构造（intent/reason/required_evidence/next_skill_hint）"
+        },
+        "platform_view": {
+          "kind": "artifact",
+          "accepts": [
+            "PlatformView"
+          ],
+          "autobuild": "platform_view_from_page_text"
+        },
+        "source_artifacts": {
+          "kind": "artifact_list",
+          "description": "本步依据的已登记产物引用列表"
+        }
+      },
       "typical_next_skills": [
         "aftercare-verify",
         "aftercare-recover"
       ],
-      "implemented": false
+      "implemented": true
     },
     {
       "skill_id": "aftercare-verify",
       "display_name": "状态与结果核对",
       "layer": "common",
+      "skill_version": "1.0.0",
+      "package": "skills/aftercare-verify",
+      "schema": "references/verify.schema.json",
       "input_schema": "aftercare-verifyRequest",
       "result_schema": "aftercare-verifyResult",
       "output_kind": "OutcomeReport",
+      "required_inputs": {
+        "platform_view": {
+          "kind": "artifact",
+          "accepts": [
+            "PlatformView"
+          ],
+          "autobuild": "platform_view_from_page_text"
+        },
+        "receipt": {
+          "kind": "artifact",
+          "accepts": [
+            "ExecutionReceipt"
+          ],
+          "optional": true
+        },
+        "ledger": {
+          "kind": "ledger"
+        }
+      },
       "typical_next_skills": [
         "aftercare-logistics",
         "aftercare-evidence",
         "aftercare-appeal",
         "aftercare-recover"
       ],
-      "implemented": false
+      "implemented": true
     },
     {
       "skill_id": "aftercare-recover",
       "display_name": "页面变化与失败恢复",
       "layer": "common",
+      "skill_version": "1.0.0",
+      "package": "skills/aftercare-recover",
+      "schema": "references/recover.schema.json",
       "input_schema": "aftercare-recoverRequest",
       "result_schema": "aftercare-recoverResult",
       "output_kind": "RecoveryPlan",
+      "required_inputs": {
+        "failure": {
+          "kind": "artifact",
+          "accepts": [
+            "FailureEvent"
+          ]
+        },
+        "platform_view": {
+          "kind": "artifact",
+          "accepts": [
+            "PlatformView"
+          ],
+          "autobuild": "platform_view_from_page_text"
+        },
+        "ledger": {
+          "kind": "ledger"
+        },
+        "outcome": {
+          "kind": "artifact",
+          "accepts": [
+            "OutcomeReport"
+          ],
+          "optional": true
+        }
+      },
       "typical_next_skills": [
         "aftercare-interact",
         "aftercare-verify",
         "aftercare-handoff"
       ],
-      "implemented": false
+      "implemented": true
     },
     {
       "skill_id": "aftercare-resume",
-      "display_name": "跨会话恢复",
+      "display_name": "售后任务续办",
       "layer": "common",
+      "skill_version": "1.0.0",
+      "package": "skills/aftercare-resume",
+      "schema": "references/resume.schema.json",
       "input_schema": "aftercare-resumeRequest",
       "result_schema": "aftercare-resumeResult",
       "output_kind": "ResumePlan",
+      "required_inputs": {
+        "saved_task": {
+          "kind": "artifact",
+          "accepts": [
+            "TaskSnapshot"
+          ],
+          "autobuild": "saved_task_snapshot"
+        },
+        "platform_view": {
+          "kind": "artifact",
+          "accepts": [
+            "PlatformView"
+          ],
+          "autobuild": "platform_view_from_page_text"
+        },
+        "current_outcome": {
+          "kind": "artifact",
+          "accepts": [
+            "OutcomeReport"
+          ]
+        },
+        "ledger": {
+          "kind": "ledger"
+        }
+      },
       "typical_next_skills": [
         "aftercare-order",
         "aftercare-remedy",
         "aftercare-interact"
       ],
-      "implemented": false
+      "implemented": true
     },
     {
       "skill_id": "aftercare-logistics",
       "display_name": "退货与平台内取件",
       "layer": "common",
+      "skill_version": "1.0.0",
+      "package": "skills/aftercare-logistics",
+      "schema": "references/logistics.schema.json",
       "input_schema": "aftercare-logisticsRequest",
       "result_schema": "aftercare-logisticsResult",
       "output_kind": "LogisticsPlan",
+      "required_inputs": {
+        "order": {
+          "kind": "artifact",
+          "accepts": [
+            "OrderSelection"
+          ]
+        },
+        "remedy": {
+          "kind": "artifact",
+          "accepts": [
+            "RemedyPlan"
+          ]
+        },
+        "outcome": {
+          "kind": "artifact",
+          "accepts": [
+            "OutcomeReport"
+          ]
+        },
+        "platform_view": {
+          "kind": "artifact",
+          "accepts": [
+            "PlatformView"
+          ],
+          "autobuild": "platform_view_from_page_text"
+        },
+        "user_decision": {
+          "kind": "artifact",
+          "accepts": [
+            "UserDecision"
+          ],
+          "optional": true
+        }
+      },
       "typical_next_skills": [
         "aftercare-interact",
         "aftercare-verify"
       ],
-      "implemented": false
+      "implemented": true
     },
     {
       "skill_id": "aftercare-appeal",
       "display_name": "平台内复核与申诉",
       "layer": "common",
+      "skill_version": "1.0.0",
+      "package": "skills/aftercare-appeal",
+      "schema": "references/appeal.schema.json",
       "input_schema": "aftercare-appealRequest",
       "result_schema": "aftercare-appealResult",
       "output_kind": "AppealDraft",
+      "required_inputs": {
+        "outcome": {
+          "kind": "artifact",
+          "accepts": [
+            "OutcomeReport"
+          ]
+        },
+        "platform_view": {
+          "kind": "artifact",
+          "accepts": [
+            "PlatformView"
+          ],
+          "autobuild": "platform_view_from_page_text"
+        },
+        "evidence": {
+          "kind": "artifact",
+          "accepts": [
+            "EvidenceBundle"
+          ]
+        },
+        "ledger": {
+          "kind": "ledger"
+        }
+      },
       "typical_next_skills": [
         "aftercare-evidence",
         "aftercare-interact",
         "aftercare-handoff"
       ],
-      "implemented": false
+      "implemented": true
     },
     {
       "skill_id": "aftercare-handoff",
       "display_name": "官方客服交接",
       "layer": "common",
+      "skill_version": "1.0.0",
+      "package": "skills/aftercare-handoff",
+      "schema": null,
       "input_schema": "aftercare-handoffRequest",
       "result_schema": "aftercare-handoffResult",
       "output_kind": "HandoffDraft",
+      "required_inputs": {
+        "outcome": {
+          "kind": "artifact",
+          "accepts": [
+            "OutcomeReport"
+          ]
+        },
+        "ledger": {
+          "kind": "ledger"
+        },
+        "platform_view": {
+          "kind": "artifact",
+          "accepts": [
+            "PlatformView"
+          ],
+          "autobuild": "platform_view_from_page_text"
+        },
+        "evidence": {
+          "kind": "artifact",
+          "accepts": [
+            "EvidenceBundle"
+          ],
+          "optional": true
+        }
+      },
       "typical_next_skills": [
         "aftercare-interact"
       ],
-      "implemented": false
+      "implemented": true
     },
     {
       "skill_id": "platform-main",
       "display_name": "主平台适配",
       "layer": "platform",
+      "skill_version": null,
+      "package": null,
+      "schema": null,
       "input_schema": "platform-mainRequest",
       "result_schema": "platform-mainResult",
       "output_kind": "PlatformView",
+      "required_inputs": {},
       "typical_next_skills": [
         "aftercare-order",
         "aftercare-remedy",
         "aftercare-interact",
         "aftercare-verify"
       ],
-      "implemented": false
+      "implemented": false,
+      "unavailable_reason": "上游未交付该 Skill 包（GitHub 上不存在对应仓库）"
     },
     {
       "skill_id": "platform-secondary",
       "display_name": "次平台适配",
       "layer": "platform",
+      "skill_version": null,
+      "package": null,
+      "schema": null,
       "input_schema": "platform-secondaryRequest",
       "result_schema": "platform-secondaryResult",
       "output_kind": "PlatformView",
+      "required_inputs": {},
       "typical_next_skills": [
         "aftercare-order",
         "aftercare-remedy",
         "aftercare-interact",
         "aftercare-verify"
       ],
-      "implemented": false
+      "implemented": false,
+      "unavailable_reason": "上游未交付该 Skill 包（GitHub 上不存在对应仓库）"
     },
     {
       "skill_id": "platform-sandbox",
       "display_name": "测试商城适配",
       "layer": "platform",
+      "skill_version": null,
+      "package": null,
+      "schema": null,
       "input_schema": "platform-sandboxRequest",
       "result_schema": "platform-sandboxResult",
       "output_kind": "PlatformView",
+      "required_inputs": {},
       "typical_next_skills": [
         "aftercare-order",
         "aftercare-remedy",
         "aftercare-interact",
         "aftercare-verify"
       ],
-      "implemented": false
+      "implemented": false,
+      "unavailable_reason": "上游未交付该 Skill 包；宿主仅以沙箱适配器临时顶替（skill_runtime.sandbox_platform_view），不宣称已实现该 Skill"
     }
   ]
 }

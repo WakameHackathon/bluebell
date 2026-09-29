@@ -1,0 +1,26 @@
+{
+  "message_type": "result",
+  "body": {
+    "contract_version": "1.0.0",
+    "skill_id": "aftercare-appeal",
+    "call_id": "call-sample-01",
+    "task_id": "task-sample-01",
+    "based_on_task_revision": 4,
+    "status": "completed",
+    "data": {
+      "reason_evidence_refs": ["ev-platform-reason-01"],
+      "grounds": [
+        {"key": "photo_scope", "value": "用户提交的照片可见商品整体及问题位置。", "evidence_refs": ["ev-photo-01"], "certainty": "observed"},
+        {"key": "user_request", "value": "用户希望平台结合补充说明重新核对。", "evidence_refs": ["ev-user-turn-01"], "certainty": "user_reported"}
+      ],
+      "draft_text": "平台记录以照片未显示问题位置为由退回申请。现有照片可见商品整体及问题位置，请结合原照片重新核对本次申请。",
+      "file_refs": ["file-photo-01"],
+      "missing_evidence": [],
+      "available_route_refs": ["route-current-01"],
+      "recommendation": "prepare"
+    },
+    "questions": [],
+    "issues": [],
+    "user_message": "平台记录写的是照片没有显示问题位置；你希望用现有照片请平台重新核对。请先确认草稿和准备引用的照片是否准确。这只是草稿，尚未提交。"
+  }
+}

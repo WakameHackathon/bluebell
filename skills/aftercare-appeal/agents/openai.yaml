@@ -1,0 +1,4 @@
+interface:
+  display_name: "平台内复核与申诉"
+  short_description: "核对售后处理原因、证据和平台内复核路径，起草真实可核对的内容。"
+  default_prompt: "根据当前售后记录和真实材料，判断是否适合平台内复核，并准备可核对的申诉草稿。"

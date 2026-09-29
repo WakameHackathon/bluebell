@@ -1,0 +1,24 @@
+{
+  "source": "external-source/contracts.schema.json",
+  "sha256": "285e953a39b485c46712bf5d14a677aa5d1e2e7ab69f38cf99cbf0fc3b7ec493",
+  "contract_version": "1.0.0",
+  "skill_version": "1.0.0",
+  "definitions": [
+    "Action",
+    "ExecutionReceipt",
+    "Fact",
+    "InteractionPlan",
+    "Issue",
+    "Observation",
+    "OperationLedger",
+    "OutcomeReport",
+    "PlatformView",
+    "Question",
+    "Step",
+    "TaskSnapshot",
+    "UserTurn",
+    "aftercare-verifyRequest",
+    "aftercare-verifyResult"
+  ],
+  "method": "Recursive unmodified $defs extraction; source is authoritative; candidate is not enabled."
+}

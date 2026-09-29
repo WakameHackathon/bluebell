@@ -1,0 +1,88 @@
+{
+  "contract_version": "1.0.0",
+  "definitions": [
+    "Candidate",
+    "EvidenceBundle",
+    "Fact",
+    "Issue",
+    "Option",
+    "OrderSelection",
+    "PlatformView",
+    "Question",
+    "RemedyPlan",
+    "Step",
+    "TaskIntent",
+    "TaskSnapshot",
+    "UserDecision",
+    "UserTurn",
+    "aftercare-evidenceRequest",
+    "aftercare-evidenceResult",
+    "aftercare-interactRequest"
+  ],
+  "sources": [
+    {
+      "path": "LOCAL_USER_HOME\\Documents\\Codex\\2026-09-25\\kai\\outputs\\售后Agent-Skills接口-v1\\contracts.schema.json",
+      "sha256": "285e953a39b485c46712bf5d14a677aa5d1e2e7ab69f38cf99cbf0fc3b7ec493"
+    },
+    {
+      "path": "LOCAL_USER_HOME\\Documents\\Codex\\2026-09-25\\kai\\outputs\\售后Agent-Skills接口-v1\\skill-catalog.json",
+      "sha256": "9cfef99693da8d76c3cb354e5b403b33fee550145208ec680a909215615fb258"
+    },
+    {
+      "path": "LOCAL_USER_HOME\\Documents\\Codex\\2026-09-25\\kai\\outputs\\售后Agent-Skills接口-v1\\Skills清单与衔接规范.md",
+      "sha256": "d7b70202f108e521152857fe12b98d1f6177367d3fdcae186c394636a0989709"
+    },
+    {
+      "path": "LOCAL_USER_HOME\\Documents\\Codex\\2026-09-25\\kai\\outputs\\售后助手Agent-完整项目规划书-v1.md",
+      "sha256": "b79e7aef6548d0737dfb163ea7e03d03cde1f607ef173f57a42dc791d232924e"
+    },
+    {
+      "path": "LOCAL_USER_HOME\\Documents\\Codex\\2026-09-27\\files-pasted-by-the-user-skill\\outputs\\测试报告.md",
+      "sha256": "def96074895f2fc9fdcd4aeebb2ab4e82be8fe5af6d8af06b09f046c0820d1fd"
+    },
+    {
+      "path": "LOCAL_USER_HOME\\Documents\\Codex\\2026-09-27\\files-pasted-by-the-user-skill\\outputs\\契约修订提案.md",
+      "sha256": "906209d253edb16f15aefdae192f22233ab3b8073d109412d3796e437f574f16"
+    },
+    {
+      "path": "LOCAL_USER_HOME\\Documents\\Codex\\2026-09-27\\files-pasted-by-the-user-skill\\outputs\\aftercare-order\\SKILL.md",
+      "sha256": "538246d31bca299e97ec3f718002b223558a924c7758264567a7070d1e96dd81"
+    },
+    {
+      "path": "LOCAL_USER_HOME\\Documents\\Codex\\2026-09-27\\files-pasted-by-the-user-skill-2\\outputs\\测试报告.md",
+      "sha256": "e1b4bf311500d6a408083ca6dec9f3311f4fdd996493bcf12ff265d644decf8b"
+    },
+    {
+      "path": "LOCAL_USER_HOME\\Documents\\Codex\\2026-09-27\\files-pasted-by-the-user-skill-2\\outputs\\契约修订提案.md",
+      "sha256": "c08eb0a6f6e06de250831232436542069283cb493816dc08a34a6eafd92c1831"
+    },
+    {
+      "path": "LOCAL_USER_HOME\\Documents\\Codex\\2026-09-27\\files-pasted-by-the-user-skill-2\\outputs\\aftercare-remedy\\SKILL.md",
+      "sha256": "97ae006749c5c931b959b538ea9e1c8541d4a8ead5f9efcd907bcf6e9c1d521d"
+    },
+    {
+      "path": "LOCAL_USER_HOME\\Documents\\Codex\\2026-09-27\\skill-creator-aftercare-intake-c-users-2\\outputs\\release-1.2.0\\aftercare-intake\\SKILL.md",
+      "sha256": "8b945f596e026e404c878f19bb82b507097ce6e3c20fb22fc1539c7a39f3403c"
+    },
+    {
+      "path": "LOCAL_USER_HOME\\Documents\\Codex\\2026-09-27\\skill-creator-aftercare-intake-c-users-2\\outputs\\release-1.2.0\\BENCHMARK.md",
+      "sha256": "5e0b73fd4a680fcb687a151e6c5e6b74c755252dabce304e476306e1baf501da"
+    },
+    {
+      "path": "LOCAL_USER_HOME\\Documents\\Codex\\2026-09-27\\skill-creator-aftercare-intake-c-users-2\\outputs\\release-1.2.0\\local_host\\demo.py",
+      "sha256": "1d814c3d6e546124a4a05fc0704536e5db22d6c13c0947d881ac0a4222c006e0"
+    },
+    {
+      "path": "LOCAL_USER_HOME\\Documents\\Codex\\2026-09-27\\skill-creator-aftercare-intake-c-users-2\\outputs\\release-1.2.0\\local_host\\store.py",
+      "sha256": "ba9c4c89602a747d19ac10e6960dd8951921f3392b912a69a63567813e65fb8f"
+    },
+    {
+      "path": "LOCAL_USER_HOME\\Documents\\Codex\\2026-09-27\\skill-creator-aftercare-intake-c-users-2\\outputs\\release-1.2.0\\candidate\\confirmation_gate.py",
+      "sha256": "6f744561097340f471ca1a03d7288cb6ad89160fa21834ead2bc7a6215dc50ab"
+    },
+    {
+      "path": "LOCAL_USER_HOME\\.codex\\skills\\aftercare-remedy\\SKILL.md",
+      "sha256": "97ae006749c5c931b959b538ea9e1c8541d4a8ead5f9efcd907bcf6e9c1d521d"
+    }
+  ]
+}

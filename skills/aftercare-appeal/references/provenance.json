@@ -1,0 +1,16 @@
+{
+  "authority": "contracts.schema.json",
+  "authority_id": "urn:aftercare:skill-contracts:1.0.0",
+  "contract_version": "1.0.0",
+  "sha256": "285e953a39b485c46712bf5d14a677aa5d1e2e7ab69f38cf99cbf0fc3b7ec493",
+  "derived_definitions": [
+    "AppealDraft",
+    "Fact",
+    "Issue",
+    "Question",
+    "aftercare-appealRequest",
+    "aftercare-appealResult"
+  ],
+  "generated_by": "scripts/extract_contract.py",
+  "status": "derived_snapshot_not_authority"
+}

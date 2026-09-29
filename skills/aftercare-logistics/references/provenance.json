@@ -1,0 +1,83 @@
+{
+  "central_contract_version": "1.0.0",
+  "skill_version": "1.0.0",
+  "source_files": [
+    {
+      "sha256": "285e953a39b485c46712bf5d14a677aa5d1e2e7ab69f38cf99cbf0fc3b7ec493",
+      "source_id": "baseline/contracts.schema.json"
+    },
+    {
+      "sha256": "9cfef99693da8d76c3cb354e5b403b33fee550145208ec680a909215615fb258",
+      "source_id": "baseline/skill-catalog.json"
+    },
+    {
+      "sha256": "d7b70202f108e521152857fe12b98d1f6177367d3fdcae186c394636a0989709",
+      "source_id": "baseline/Skills清单与衔接规范.md"
+    },
+    {
+      "sha256": "b79e7aef6548d0737dfb163ea7e03d03cde1f607ef173f57a42dc791d232924e",
+      "source_id": "baseline/售后助手Agent-完整项目规划书-v1.md"
+    },
+    {
+      "sha256": "538246d31bca299e97ec3f718002b223558a924c7758264567a7070d1e96dd81",
+      "source_id": "aftercare-order/SKILL.md"
+    },
+    {
+      "sha256": "85f7746aea50607fa62a9ac4e2c69bbf9b9edafa404aa0c05ae40b5fbc5a948e",
+      "source_id": "aftercare-order/references/contract.md"
+    },
+    {
+      "sha256": "97ae006749c5c931b959b538ea9e1c8541d4a8ead5f9efcd907bcf6e9c1d521d",
+      "source_id": "aftercare-remedy/SKILL.md"
+    },
+    {
+      "sha256": "c921a089b76f0f7a0ad79c0a0937f04755867480f1687ccf2f43da2d2b3e4bfc",
+      "source_id": "aftercare-remedy/references/contract.md"
+    },
+    {
+      "sha256": "8340abc075c8dc5998aa38c8425135edc571cac569fc1997de3f6e4b13bf8e56",
+      "source_id": "aftercare-interact/SKILL.md"
+    },
+    {
+      "sha256": "bcec52a2ed4f74aa1d8b43182bb6027b0d21e03b8f87820952262483ccdc4a3f",
+      "source_id": "aftercare-interact/references/contract.md"
+    },
+    {
+      "sha256": "289fda30a9f6dde45001e534ee6c1daef25fd6e3f501852a7b7965a12f3fd4a4",
+      "source_id": "aftercare-interact/references/runtime.md"
+    },
+    {
+      "sha256": "945154d7b59403e137448c275e62dc7b8b4e6973927d4e7bcee2256a95439b86",
+      "source_id": "aftercare-verify/SKILL.md"
+    },
+    {
+      "sha256": "59186246188026b384e3d7924a76453180466cf0af30c12490bba4df0d1e1cdc",
+      "source_id": "aftercare-verify/references/contract.md"
+    },
+    {
+      "sha256": "aba0ef505b0eb714bac70551f3eaa66af19e4d3774b0b064f104d8963874e328",
+      "source_id": "aftercare-recover/SKILL.md"
+    },
+    {
+      "sha256": "f22b73373351c063059f38a2c61bfd7d9178c2191af1a13ae191a5b5e22931c1",
+      "source_id": "aftercare-recover/references/contract.md"
+    },
+    {
+      "sha256": "41f1da80373f1b43642dbe6c35eb5fcc535812c703cb029de13b973a32b046fb",
+      "source_id": "aftercare-recover/references/integration.md"
+    },
+    {
+      "sha256": "254558e605c59ea92db7a3bf6c13cd6b1658fe121f4d9ad26a3f8acf4add8c48",
+      "source_id": "aftercare-resume/SKILL.md"
+    },
+    {
+      "sha256": "273e995e1db5b88d23da01a8d2cfd7b43062dea93f81874fa522ec772dcd9811",
+      "source_id": "aftercare-resume/references/contract.md"
+    },
+    {
+      "sha256": "56c33176e7a3db14b4a7a5bc24fd652f2d8f10cea4d69d91eadf7328591f0f4b",
+      "source_id": "aftercare-resume/references/integration.md"
+    }
+  ],
+  "note": "文件审阅与定义派生；不代表运行时服务集成。"
+}

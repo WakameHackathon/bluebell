@@ -1,0 +1,19 @@
+{
+  "message_type": "request",
+  "body": {
+    "contract_version": "1.0.0",
+    "skill_id": "aftercare-appeal",
+    "skill_version": "1.0.0",
+    "call_id": "call-sample-01",
+    "task_id": "task-sample-01",
+    "expected_task_revision": 4,
+    "mode": "guided",
+    "task_snapshot": {"artifact_id": "snapshot-sample-01", "kind": "TaskSnapshot", "revision": 4},
+    "inputs": {
+      "outcome": {"artifact_id": "outcome-sample-01", "kind": "OutcomeReport", "revision": 1},
+      "platform_view": {"artifact_id": "view-sample-01", "kind": "PlatformView", "revision": 2},
+      "evidence": {"artifact_id": "evidence-sample-01", "kind": "EvidenceBundle", "revision": 1},
+      "ledger": {"artifact_id": "ledger-sample-01", "kind": "OperationLedger", "revision": 3}
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "source": "contracts.schema.json",
+  "source_id": "urn:aftercare:skill-contracts:1.0.0",
+  "sha256": "285e953a39b485c46712bf5d14a677aa5d1e2e7ab69f38cf99cbf0fc3b7ec493",
+  "derivation": "verbatim recursive $defs closure",
+  "definitions": [
+    "Candidate",
+    "Fact",
+    "Issue",
+    "Observation",
+    "OrderSelection",
+    "PlatformView",
+    "Question",
+    "Step",
+    "TaskIntent",
+    "TaskSnapshot",
+    "UserDecision",
+    "UserTurn",
+    "aftercare-orderRequest",
+    "aftercare-orderResult"
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "source": "external-source/contracts.schema.json",
+  "sha256": "285e953a39b485c46712bf5d14a677aa5d1e2e7ab69f38cf99cbf0fc3b7ec493",
+  "contract_version": "1.0.0",
+  "definitions": [
+    "Fact",
+    "Issue",
+    "OperationLedger",
+    "OutcomeReport",
+    "PlatformView",
+    "Question",
+    "ResumePlan",
+    "Step",
+    "TaskSnapshot",
+    "aftercare-resumeRequest",
+    "aftercare-resumeResult"
+  ]
+}

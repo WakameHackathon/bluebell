@@ -1,0 +1,4 @@
+interface:
+  display_name: "售后状态与结果核对"
+  short_description: "区分平台状态、操作效果与售后终局，保留证据和未知结果，避免重复提交"
+  default_prompt: "使用 $aftercare-verify 核对当前售后状态及本次操作结果，说明已知、未知和下一步。"

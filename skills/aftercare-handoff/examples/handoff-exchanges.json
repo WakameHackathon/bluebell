@@ -1,0 +1,44 @@
+{
+  "description": "Synthetic, illustrative interface examples only; identifiers are fake and no message is sent.",
+  "request_shape": {
+    "contract_version": "1.0.0",
+    "skill_id": "aftercare-handoff",
+    "skill_version": "1.0.0",
+    "call_id": "call_demo_11",
+    "task_id": "task_demo_7",
+    "expected_task_revision": 4,
+    "mode": "guided",
+    "task_snapshot": {"artifact_id": "snap_demo_4", "kind": "TaskSnapshot", "revision": 4},
+    "inputs": {
+      "outcome": {"artifact_id": "out_demo_2", "kind": "OutcomeReport", "revision": 2},
+      "ledger": {"artifact_id": "ledger_demo_3", "kind": "OperationLedger", "revision": 3},
+      "platform_view": {"artifact_id": "view_demo_8", "kind": "PlatformView", "revision": 8},
+      "evidence": null
+    }
+  },
+  "result_shape": {
+    "contract_version": "1.0.0",
+    "skill_id": "aftercare-handoff",
+    "call_id": "call_demo_11",
+    "task_id": "task_demo_7",
+    "based_on_task_revision": 4,
+    "status": "needs_user",
+    "data": {
+      "official_channel_ref": "channel_demo_1",
+      "summary": "用户希望核实售后申请为何仍未处理（用户说明）。平台页面当前显示“待审核”（页面观察）；暂未找到平台给出的预计完成时间。操作记录没有已提交客服消息的回执。",
+      "timeline_evidence_refs": ["turn_demo_1", "obs_demo_8"],
+      "unresolved_questions": ["平台何时会更新审核结果？"],
+      "message_draft": "您好，我想请您帮忙核实这笔售后申请目前的审核进度，以及是否还需要我补充材料。页面目前显示“待审核”；我暂未看到其他处理说明。谢谢。",
+      "file_refs": []
+    },
+    "questions": [{"question_id": "review_demo_1", "text": "我整理的重点是请客服核实审核进度，对吗？这只是核对草稿，不会发送。", "choices": [{"value": "yes", "label": "对"}, {"value": "correct", "label": "需要修改"}, {"value": "no_contact", "label": "先不联系"}]}],
+    "issues": [],
+    "user_message": "我整理了一份尚未发送的草稿，请先核对事实和问题重点。"
+  },
+  "downstream": [
+    {"stage": "user_review", "meaning": "User may correct draft; this is not send consent."},
+    {"stage": "execution_layer", "meaning": "Separately verifies recipient, exact current text, attachments, consequences and fresh explicit authorization before any one-step send action."},
+    {"stage": "aftercare-interact", "meaning": "Only prepares a single action from a current platform view; actual execution remains host-controlled."},
+    {"stage": "aftercare-verify", "meaning": "After execution, checks receipt/status; unknown result is reconciled before any retry."}
+  ]
+}

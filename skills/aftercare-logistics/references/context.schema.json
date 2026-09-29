@@ -1,0 +1,520 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "current_revision": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "mode": {
+      "enum": [
+        "self",
+        "guided",
+        "auto"
+      ]
+    },
+    "paused": {
+      "type": "boolean"
+    },
+    "session_epoch": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "request_epoch": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "now": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "observed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "observation_expires_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "page_revision": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "item_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "case_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "account_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "platform_key": {
+      "type": "string",
+      "minLength": 1
+    },
+    "pickup_address_ref": {
+      "anyOf": [
+        {
+          "type": "string",
+          "minLength": 1
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "return_address_ref": {
+      "anyOf": [
+        {
+          "type": "string",
+          "minLength": 1
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "time_slot_ref": {
+      "anyOf": [
+        {
+          "type": "string",
+          "minLength": 1
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "tracking_ref": {
+      "anyOf": [
+        {
+          "type": "string",
+          "minLength": 1
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "fee": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "currency": {
+              "type": "string",
+              "pattern": "^[A-Z]{3}$"
+            },
+            "minor_units": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "currency",
+            "minor_units"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "facts": {
+      "type": "object",
+      "properties": {
+        "target_confirmed": {
+          "type": "boolean"
+        },
+        "remedy_confirmed": {
+          "type": "boolean"
+        },
+        "history_complete": {
+          "type": "boolean"
+        },
+        "page_changed": {
+          "type": "boolean"
+        },
+        "resuming": {
+          "type": "boolean"
+        },
+        "login_required": {
+          "type": "boolean"
+        },
+        "permission": {
+          "type": "boolean"
+        },
+        "conflict": {
+          "type": "boolean"
+        },
+        "address_conflict": {
+          "type": "boolean"
+        },
+        "payment_page": {
+          "type": "boolean"
+        },
+        "user_cannot_answer": {
+          "type": "boolean"
+        },
+        "logistics_exception": {
+          "type": "boolean"
+        },
+        "return_instructions": {
+          "type": "boolean"
+        },
+        "pickup_entry": {
+          "type": "boolean"
+        },
+        "service_selected": {
+          "type": "boolean"
+        },
+        "package_selected": {
+          "type": "boolean"
+        },
+        "extra_fees_resolved": {
+          "type": "boolean"
+        },
+        "insurance": {
+          "type": "boolean"
+        },
+        "remedy_kind": {
+          "enum": [
+            "refund_only",
+            "return_refund",
+            "unknown"
+          ]
+        },
+        "action_state": {
+          "enum": [
+            "none",
+            "sent",
+            "unknown",
+            "booked"
+          ]
+        },
+        "requested_operation": {
+          "enum": [
+            "prepare",
+            "track",
+            "cancel",
+            "reschedule"
+          ]
+        },
+        "return_allowed": {
+          "enum": [
+            "yes",
+            "no",
+            "unknown"
+          ]
+        },
+        "deadline_state": {
+          "enum": [
+            "valid",
+            "near",
+            "expired",
+            "unknown",
+            "not_applicable"
+          ]
+        },
+        "method": {
+          "enum": [
+            "pickup",
+            "self_shipping",
+            "unselected"
+          ]
+        },
+        "shipping_state": {
+          "enum": [
+            "none",
+            "waybill_created",
+            "user_reported_shipped",
+            "collected",
+            "signed",
+            "merchant_received"
+          ]
+        },
+        "tracking_match": {
+          "enum": [
+            "verified_return",
+            "unmatched",
+            "original",
+            "unclear"
+          ]
+        },
+        "fee_kind": {
+          "enum": [
+            "confirmed",
+            "estimated",
+            "unknown",
+            "rule_only"
+          ]
+        },
+        "platform_state": {
+          "type": "string",
+          "enum": [
+            "not_started",
+            "draft",
+            "submitted",
+            "pending",
+            "needs_evidence",
+            "return_required",
+            "pickup_booked",
+            "in_transit",
+            "refund_processing",
+            "refund_reported_complete",
+            "rejected",
+            "closed",
+            "unknown"
+          ]
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "required": [
+        "target_confirmed",
+        "remedy_confirmed",
+        "history_complete",
+        "page_changed",
+        "resuming",
+        "login_required",
+        "permission",
+        "conflict",
+        "address_conflict",
+        "payment_page",
+        "user_cannot_answer",
+        "logistics_exception",
+        "return_instructions",
+        "pickup_entry",
+        "service_selected",
+        "package_selected",
+        "extra_fees_resolved",
+        "insurance",
+        "remedy_kind",
+        "action_state",
+        "requested_operation",
+        "return_allowed",
+        "deadline_state",
+        "method",
+        "shipping_state",
+        "tracking_match",
+        "fee_kind",
+        "platform_state",
+        "evidence_refs"
+      ],
+      "additionalProperties": false
+    },
+    "registry": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "task_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "item_ref": {
+            "type": "string",
+            "minLength": 1
+          },
+          "case_ref": {
+            "type": "string",
+            "minLength": 1
+          },
+          "account_ref": {
+            "type": "string",
+            "minLength": 1
+          },
+          "platform_key": {
+            "type": "string",
+            "minLength": 1
+          },
+          "kind": {
+            "type": "string",
+            "minLength": 1
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "accessible": {
+            "type": "boolean"
+          },
+          "current": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "task_id",
+          "item_ref",
+          "case_ref",
+          "account_ref",
+          "platform_key",
+          "kind",
+          "revision",
+          "accessible",
+          "current",
+          "data"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "objects": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "task_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "item_ref": {
+            "type": "string",
+            "minLength": 1
+          },
+          "case_ref": {
+            "type": "string",
+            "minLength": 1
+          },
+          "account_ref": {
+            "type": "string",
+            "minLength": 1
+          },
+          "platform_key": {
+            "type": "string",
+            "minLength": 1
+          },
+          "role": {
+            "enum": [
+              "pickup_address",
+              "return_address",
+              "time_slot",
+              "tracking",
+              "evidence",
+              "selection",
+              "item",
+              "order",
+              "grant",
+              "event",
+              "pending",
+              "service",
+              "package"
+            ]
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "accessible": {
+            "type": "boolean"
+          },
+          "current": {
+            "type": "boolean"
+          },
+          "observed_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "source": {
+            "enum": [
+              "platform",
+              "user_reported",
+              "ocr",
+              "host"
+            ]
+          },
+          "verified": {
+            "type": "boolean"
+          },
+          "direction": {
+            "enum": [
+              "return",
+              "original",
+              "unknown"
+            ]
+          },
+          "page_revision": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "starts_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "ends_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "task_id",
+          "item_ref",
+          "case_ref",
+          "account_ref",
+          "platform_key",
+          "role",
+          "revision",
+          "accessible",
+          "current",
+          "observed_at",
+          "expires_at",
+          "source",
+          "verified",
+          "direction",
+          "page_revision",
+          "starts_at",
+          "ends_at"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "object_versions": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "integer",
+        "minimum": 0
+      }
+    }
+  },
+  "required": [
+    "current_revision",
+    "mode",
+    "paused",
+    "session_epoch",
+    "request_epoch",
+    "now",
+    "observed_at",
+    "observation_expires_at",
+    "page_revision",
+    "item_ref",
+    "case_ref",
+    "account_ref",
+    "platform_key",
+    "pickup_address_ref",
+    "return_address_ref",
+    "time_slot_ref",
+    "tracking_ref",
+    "fee",
+    "facts",
+    "registry",
+    "objects",
+    "object_versions"
+  ],
+  "additionalProperties": false
+}

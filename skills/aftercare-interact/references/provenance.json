@@ -1,0 +1,99 @@
+{
+  "extracted_definitions": [
+    "Action",
+    "AppealDraft",
+    "Candidate",
+    "EvidenceBundle",
+    "ExecutionReceipt",
+    "Fact",
+    "HandoffDraft",
+    "InteractionPlan",
+    "Issue",
+    "LogisticsPlan",
+    "Money",
+    "OperationLedger",
+    "Option",
+    "OrderSelection",
+    "PlatformView",
+    "Question",
+    "RecoveryPlan",
+    "RemedyPlan",
+    "ResumePlan",
+    "Step",
+    "TaskIntent",
+    "TaskSnapshot",
+    "aftercare-interactRequest",
+    "aftercare-interactResult",
+    "aftercare-verifyRequest"
+  ],
+  "sources": [
+    {
+      "path": "LOCAL_USER_HOME\\Documents\\Codex\\2026-09-25\\kai\\outputs\\售后Agent-Skills接口-v1\\contracts.schema.json",
+      "sha256": "285e953a39b485c46712bf5d14a677aa5d1e2e7ab69f38cf99cbf0fc3b7ec493"
+    },
+    {
+      "path": "LOCAL_USER_HOME\\Documents\\Codex\\2026-09-25\\kai\\outputs\\售后Agent-Skills接口-v1\\skill-catalog.json",
+      "sha256": "9cfef99693da8d76c3cb354e5b403b33fee550145208ec680a909215615fb258"
+    },
+    {
+      "path": "LOCAL_USER_HOME\\Documents\\Codex\\2026-09-25\\kai\\outputs\\售后Agent-Skills接口-v1\\Skills清单与衔接规范.md",
+      "sha256": "d7b70202f108e521152857fe12b98d1f6177367d3fdcae186c394636a0989709"
+    },
+    {
+      "path": "LOCAL_USER_HOME\\Documents\\Codex\\2026-09-25\\kai\\outputs\\售后助手Agent-完整项目规划书-v1.md",
+      "sha256": "b79e7aef6548d0737dfb163ea7e03d03cde1f607ef173f57a42dc791d232924e"
+    },
+    {
+      "path": "LOCAL_USER_HOME\\Documents\\Codex\\2026-09-27\\files-pasted-by-the-user-skill\\outputs\\aftercare-order\\SKILL.md",
+      "sha256": "538246d31bca299e97ec3f718002b223558a924c7758264567a7070d1e96dd81"
+    },
+    {
+      "path": "LOCAL_USER_HOME\\Documents\\Codex\\2026-09-27\\files-pasted-by-the-user-skill\\outputs\\测试报告.md",
+      "sha256": "def96074895f2fc9fdcd4aeebb2ab4e82be8fe5af6d8af06b09f046c0820d1fd"
+    },
+    {
+      "path": "LOCAL_USER_HOME\\Documents\\Codex\\2026-09-27\\files-pasted-by-the-user-skill\\outputs\\tests\\selection-positive-fixture.json",
+      "sha256": "6f7a71fb7264870594c255151796f2d369211e13c71f48ca69ce732ff1d90626"
+    },
+    {
+      "path": "LOCAL_USER_HOME\\Documents\\Codex\\2026-09-27\\files-pasted-by-the-user-skill-2\\outputs\\aftercare-remedy\\SKILL.md",
+      "sha256": "97ae006749c5c931b959b538ea9e1c8541d4a8ead5f9efcd907bcf6e9c1d521d"
+    },
+    {
+      "path": "LOCAL_USER_HOME\\Documents\\Codex\\2026-09-27\\files-pasted-by-the-user-skill-2\\outputs\\测试报告.md",
+      "sha256": "e1b4bf311500d6a408083ca6dec9f3311f4fdd996493bcf12ff265d644decf8b"
+    },
+    {
+      "path": "LOCAL_USER_HOME\\Documents\\Codex\\2026-09-27\\files-pasted-by-the-user-skill-2\\outputs\\tests\\choice-positive-fixture.json",
+      "sha256": "0ea30e66b3cab069f2a1c8b7f013005f53b1fb5028ab1b7fd183e28b1ad73a59"
+    },
+    {
+      "path": "LOCAL_USER_HOME\\Documents\\Codex\\2026-09-27\\files-pasted-by-the-user-skill-3\\outputs\\aftercare-evidence\\SKILL.md",
+      "sha256": "86d324270c76fccb295f478dc9e2913b582c01f890a4d5dcec9e02f9c0f86375"
+    },
+    {
+      "path": "LOCAL_USER_HOME\\Documents\\Codex\\2026-09-27\\files-pasted-by-the-user-skill-3\\outputs\\测试报告.md",
+      "sha256": "344c0fe77ff88b70d7af51fe43e27b1e318ee8162b29c86236b202631f423b29"
+    },
+    {
+      "path": "LOCAL_USER_HOME\\Documents\\Codex\\2026-09-27\\files-pasted-by-the-user-skill-3\\outputs\\契约修订提案.md",
+      "sha256": "f0d6dea6e1667014e95e7236ebf569ea36fbb75de4228cc0b49fe78cd3336a8d"
+    },
+    {
+      "path": "LOCAL_USER_HOME\\Documents\\Codex\\2026-09-27\\files-pasted-by-the-user-skill-3\\outputs\\examples\\result-derived.json",
+      "sha256": "6e16438917db0108378a4ba8081f23f094033ca6e24448591e4da6e7d0760f12"
+    },
+    {
+      "path": "LOCAL_USER_HOME\\Documents\\Codex\\2026-09-27\\files-pasted-by-the-user-skill-3\\outputs\\tests\\integration-trace.json",
+      "sha256": "4b17bf3f6d99b973cb21911fd4fb48dbe216a7fae751cda9e9a77087271b6d15"
+    },
+    {
+      "path": "LOCAL_USER_HOME\\Documents\\Codex\\2026-09-27\\skill-creator-aftercare-intake-c-users-2\\outputs\\release-1.2.0\\aftercare-intake\\SKILL.md",
+      "sha256": "8b945f596e026e404c878f19bb82b507097ce6e3c20fb22fc1539c7a39f3403c"
+    },
+    {
+      "path": "LOCAL_USER_HOME\\Documents\\Codex\\2026-09-27\\skill-creator-aftercare-intake-c-users-2\\outputs\\release-1.2.0\\发布与接入说明.md",
+      "sha256": "177ae06bd627679fa6e2a9735f41a49c9e06f536f1147bfef266caca5931e630"
+    }
+  ]
+}

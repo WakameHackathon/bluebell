@@ -1,0 +1,33 @@
+{
+  "contract_version": "1.0.0",
+  "skill_version": "1.2.0",
+  "derived_definitions": [
+    "Fact",
+    "Issue",
+    "Question",
+    "TaskIntent",
+    "TaskSnapshot",
+    "UserTurn",
+    "aftercare-intakeRequest",
+    "aftercare-intakeResult"
+  ],
+  "sources": [
+    {
+      "sha256": "285e953a39b485c46712bf5d14a677aa5d1e2e7ab69f38cf99cbf0fc3b7ec493",
+      "source_id": "contracts.schema.json"
+    },
+    {
+      "sha256": "9cfef99693da8d76c3cb354e5b403b33fee550145208ec680a909215615fb258",
+      "source_id": "skill-catalog.json"
+    },
+    {
+      "sha256": "d7b70202f108e521152857fe12b98d1f6177367d3fdcae186c394636a0989709",
+      "source_id": "Skills清单与衔接规范.md"
+    },
+    {
+      "sha256": "b79e7aef6548d0737dfb163ea7e03d03cde1f607ef173f57a42dc791d232924e",
+      "source_id": "售后助手Agent-完整项目规划书-v1.md"
+    }
+  ],
+  "local_contract_version": "2.0.0"
+}
