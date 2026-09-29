@@ -62,7 +62,16 @@
   .workspace h2{font-size:19px;margin:0 0 8px}.workspace p{color:var(--muted);font-size:13px}
   .toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.toolbar select,.toolbar button,.composer button{font:inherit;border:1px solid #cbd9e6;border-radius:10px;background:#fff;padding:9px 12px;color:#28425a}
   .status{font-size:12px!important;margin-left:auto}.thread{height:260px;overflow:auto;border:1px solid #e4ebf1;border-radius:12px;padding:12px;background:#f9fbfd}.bubble{max-width:85%;padding:10px 12px;margin:8px 0;border-radius:12px;background:#edf4fa;white-space:pre-wrap;line-height:1.55}.bubble.user{margin-left:auto;background:#e3f1ff}.composer{display:grid;grid-template-columns:1fr auto;gap:8px;margin-top:10px}.composer textarea{font:inherit;resize:vertical;min-height:62px;padding:10px;border:1px solid #cbd9e6;border-radius:10px}.composer button{background:#3678dc;color:#fff;border:0;padding:0 18px}.context{width:100%;font:inherit;padding:9px;border:1px solid #d5e0ea;border-radius:10px}.notice{padding:10px 12px;background:#fff8e9;border:1px solid #eedba9;border-radius:10px;color:#765c20;font-size:13px!important}
-  body.poster{background:#fff}body.poster main{max-width:none;margin:0;padding:0}body.poster h1,body.poster .intro,body.poster .preview-label,body.poster .states,body.poster .description,body.poster .credit{display:none}body.poster .stage{width:560px;height:620px;min-height:0;margin:0;border-radius:0}
+  /* 海报模式：只留球体和两只小球，标题、说明、预览按钮、下方对话区都不进画面。
+     构图压在画面上方（球体 y≈171-430、两只小球 y≈406-498），因为视频里的取景框
+     是 2.65:1，按 cover 取景会裁掉画面底部约三成，留出余量才不会切到小球。 */
+  body.poster{background:#fff}
+  body.poster main{max-width:none;margin:0;padding:0;min-height:100vh;display:grid;place-items:center}
+  body.poster h1,body.poster .intro,body.poster .preview-label,body.poster .states,body.poster .description,body.poster .credit,body.poster .workspace{display:none}
+  body.poster .stage{width:100vw;height:100vh;min-height:0;margin:0;border-radius:0;background:#fff;display:block}
+  /* scale 1.08 / top 30 是量出来的：球体在视频取景框里直径约 324px（框宽 1710 的
+     19%），再大一点第二只小球就会被取景框底边切掉。 */
+  body.poster .assistant{position:absolute;left:50%;top:30px;transform:translateX(-50%) scale(1.08);transform-origin:top center}
   @media(max-width:640px){main{margin:20px auto;padding:0 14px}.stage{min-height:550px;border-radius:20px}.assistant{height:540px}.orb-shell{width:240px;height:240px;top:43%}.control.permission{left:calc(50% - 130px);top:310px}.control.mode{left:calc(50% - 48px);top:370px}.voice{top:42px;width:184px;height:44px}}
   @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
 </style>
