@@ -89,3 +89,14 @@ Bluebell 的本地部署方案以浏览器插件为交互入口，以本地算�
 Bluebell 将网页说明转化为用户可以理解和核对的办事指引。对于求职者，它有助于减少跨网站投递时反复熟悉流程的负担；对于协助家人办事的人，它提供随页面展开的解释；对于不熟悉某类线上业务的用户，它让陌生的规则更容易理解。
 
 项目具有跨场景复用的空间：不同网站的业务内容各异，但读懂要求、准备材料、明确步骤是共同需求。以页面内容和任务对话为基础，Bluebell 可以持续积累场景化 Skills。后续重点是提升复杂页面理解、任务恢复和提示准确性，使每次帮助都更贴近用户当下的操作。
+
+## 技术栈
+
+| 层 | 实际使用 |
+| --- | --- |
+| 运行时 | Python 3.12（标准库 `sqlite3`、`http.server`） |
+| 后端依赖 | `httpx`（`requirements.txt` 唯一第三方依赖） |
+| 模型服务 | 阶跃星辰 StepFun `step-3.7-flash`，经 OpenAI 兼容接口调用（`STEP_BASE_URL`、`STEP_MODEL`、`STEP_API_KEY`） |
+| 本机存储 | SQLite（`tasks` / `turns` / `artifacts` 三张表，路径由 `AFTERCARE_DB` 指定） |
+| 浏览器插件 | Chromium Manifest V3（`sidePanel`、`scripting`、`storage`），侧边栏 + 悬浮球 |
+| 契约校验 | 自实现 JSON Schema 子集校验器（`skill_schema.py`），无第三方依赖 |
